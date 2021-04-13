@@ -1,0 +1,14 @@
+#debug: true
+
+#logging:
+#  level:
+#    org:
+#      hibernate:
+#        type: trace
+spring:
+  datasource:
+    data: db.sql
+#  jpa:
+#    properties:
+#      hibernate:
+#        show_sql: true
