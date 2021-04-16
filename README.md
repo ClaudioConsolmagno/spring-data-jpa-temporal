@@ -85,6 +85,7 @@ The following 2 functionalities aren't currently supported with this library. An
 
 # Next Steps
 
+- [ ] Document methods for javadoc
 - [ ] Remove dependency on `org.springframework.util.ReflectionUtils` (comment on class says it's for internal use only)
   - [ ] Maybe use AnnotationDetectionMethodCallback and AnnotationDetectionFieldCallback
 - [ ] Publish to Maven
@@ -97,7 +98,6 @@ The following 2 functionalities aren't currently supported with this library. An
   - [ ] Test @Query annotation on repository methods.
   - [ ] Test on AnnotatedAttributes.java
   - [x] Test DB Associations - they don't work
-- [ ] Document methods for javadoc
 - [ ] Work on limitations (section above)
   - Maybe listeners can help solve relations limitation (e.g. see EnversPreUpdateEventListenerImpl)
 - [ ] Implement `findRevisions(ID, Pageable)`

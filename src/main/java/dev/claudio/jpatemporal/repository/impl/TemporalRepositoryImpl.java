@@ -29,6 +29,16 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+/**
+ * Default implementation of the {@link TemporalRepository} interface.
+ *
+ * This implementation extends {@link SimpleJpaRepository} overriding the required methods so that all save/delete
+ * queries don't remove data from the database and instead use "from" and "to date" attributes to keep track of what's
+ * been delete and what's current. Find/exist queries are also overridden in order for them to use those same attributes
+ * and return only the current data.
+ *
+ * @author Claudio Consolmagno
+ */
 @NoRepositoryBean
 public class TemporalRepositoryImpl<T, ID> extends SimpleJpaRepository<T, ID> implements TemporalRepository<T, ID> {
 
@@ -50,7 +60,7 @@ public class TemporalRepositoryImpl<T, ID> extends SimpleJpaRepository<T, ID> im
      ******************************************************************************************************************/
 
     @Override
-    public Optional<T> findById(@NonNull final ID id, final Instant asOfInstant) {
+    public Optional<T> findById(@NonNull final ID id, @NonNull final Instant asOfInstant) {
         return findAllById(List.of(id), asOfInstant).stream().findFirst();
     }
 

@@ -14,11 +14,12 @@ name: "CodeQL"
 on:
   push:
     branches: [ main ]
-  pull_request:
+# Disabled while Java 16 isn't available
+#  pull_request:
     # The branches below must be a subset of the branches above
-    branches: [ main ]
-  schedule:
-    - cron: '22 16 * * 4'
+#    branches: [ main ]
+#  schedule:
+#    - cron: '22 16 * * 4'
 
 jobs:
   analyze:
