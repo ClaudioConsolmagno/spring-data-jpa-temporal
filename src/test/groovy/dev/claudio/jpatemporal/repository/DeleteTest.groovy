@@ -31,7 +31,7 @@ class DeleteTest extends BaseTestSpecification {
             assert repository.count() == 3
     }
 
-    def "delete - Delete entity with a null @EntityId"() {
+    def "delete - Delete entity with a null @UniqueKey"() {
         given:
             def employee = bartJob().tap {employee_id = null}
             assert repository.count() == 3

@@ -44,25 +44,25 @@ implementation 'dev.claudio:spring-data-jpa-temporal:${version}'
 ### Spring main class (e.g. [SpringDataJpaTemporalApplication.java](src/test/java/dev/claudio/jpatemporal/SpringDataJpaTemporalApplication.java))
 
 2. Use `@EnableJpaTemporalRepositories` (see `SpringDataJpaTemporalApplication.java`).
-   This makes this extension works, and that it _only_ works on repositories that extend `TemporalRepository.java` (step 6 below).
+   This makes this extension work, and that it _only_ works on repositories that extend `TemporalRepository.java` (step 6 below).
    Alternatively, you can use `@EnableJpaRepositories(repositoryFactoryBeanClass = DefaultRepositoryFactoryBean.class)` if you need to configure something else in the JPA annotation.
 
 ### Entity (e.g. [Employee.java](src/test/java/dev/claudio/jpatemporal/domain/Employee.java))
 
 3. From your domain class (e.g. `Employee.java`), extend `Temporal.java`. Alternatively, use annotations `@TemporalId`, `@FromDate` and `@ToDate` in fields of your class.
    `@TemporalId` must be your primary key so it needs to have `@Id` and `@GeneratedValue` on the same field.
-4. Use `@EntityId` on your unique key attribute in your entity (e.g. `employee_id`).
+4. Use `@UniqueKey` on your unique key attribute in your entity (e.g. `employee_id`).
 5. If you are using Lombok and are extending `Temporal.java` mark your entity with `@EqualsAndHashCode(callSuper = false)`.
    If not, make sure your equals and hashcode implementations don't use any of the values marked with `@TemporalId`, `@FromDate` and `@ToDate`.
 
 ### Repository (e.g. [Repository.java](src/test/java/dev/claudio/jpatemporal/repository/Repository.java))
 
-6. Create a repository interface that extends `TemporalRepository<T,ID>`. `T` is your entity and `ID` is the type of your unique key (marked with `@EntityId`).
+6. Create a repository interface that extends `TemporalRepository<T,ID>`. `T` is your entity and `ID` is the type of your unique key (marked with `@UniqueKey`).
    Example `extends TemporalRepository<Employee, Integer>`
 
 ### Database schema (e.g. [db.sql](src/test/resources/db.sql))
 
-7. For better query performance create a unique index on your `@EntityId` and `@ToDate` columns. 
+7. For better query performance create a unique index on your `@UniqueKey` and `@ToDate` columns. E.g. `create unique index employee_id_to_date_index on employee (employee_id, to_date);`
 
 # Alternatives
 
@@ -74,20 +74,19 @@ I'm not aware of any other "temporal" JPA implementations although there are ple
 - Triggers on the database (please don't...)
 - A native temporal implementation to your database engine (e.g. [mariadb](https://mariadb.com/docs/appdev/temporal-tables/#application-time-period-tables)).
   This is a nice auditing solution, it's basically what this project does but at the DB level.
-  This means it's not portable, you'll need to configure things manually and create manual finder methods to look at audit.
+  This means it's not portable, you'll need to configure things manually and create manual audit finder methods.
 
 # Limitations
 
 The following 2 functionalities aren't currently supported with this library. An exception may be thrown at spring boot start-up if you try to use them. I'll try and work on those in the future. 
 
-- Does not support [derived query methods](https://www.baeldung.com/spring-data-derived-queries), e.g. `findByNameAndAddress`, `countByNameAndAddress`, etc. However, you could create methods and use @Query annotation for specify the query.
+- Does not support [derived query methods](https://www.baeldung.com/spring-data-derived-queries), e.g. `findByNameAndAddress`, `countByNameAndAddress`, etc. However, you could create methods and use @Query annotation to specify a query to run.
 - Does not support relations, e.g. `@OneToOne`, `@OneToMany`, etc.
 
 # Next Steps
 
-- [ ] Document methods for javadoc
 - [ ] Remove dependency on `org.springframework.util.ReflectionUtils` (comment on class says it's for internal use only)
-  - [ ] Maybe use AnnotationDetectionMethodCallback and AnnotationDetectionFieldCallback - nope
+  - [x] Maybe use AnnotationDetectionMethodCallback and AnnotationDetectionFieldCallback - nope
   - [ ] Maybe use AnnotatedElementUtils
 - [ ] Publish to Maven
   - [ ] https://docs.gradle.org/current/userguide/building_java_projects.html#sec:building_java_libraries
@@ -99,7 +98,6 @@ The following 2 functionalities aren't currently supported with this library. An
   - [ ] Fields without getters and setters
   - [ ] Test @Query annotation on repository methods.
   - [ ] Test on AnnotatedAttributes.java
-  - [x] Test DB Associations - they don't work
 - [ ] Work on limitations (section above)
   - Maybe listeners can help solve relations limitation (e.g. see EnversPreUpdateEventListenerImpl)
 - [ ] Implement `findRevisions(ID, Pageable)`

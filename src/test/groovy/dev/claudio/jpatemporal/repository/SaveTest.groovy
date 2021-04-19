@@ -18,7 +18,7 @@ class SaveTest extends BaseTestSpecification {
         testStartTime = Instant.now()
     }
 
-    def "save - Insert new entity with non-null EntityId"() {
+    def "save - Insert new entity with non-null UniqueKey"() {
         given:
             assert repository.count() == 3
             assert repository.findById(5).isEmpty()
@@ -35,7 +35,7 @@ class SaveTest extends BaseTestSpecification {
             saveAndFlush << [true,false]
     }
 
-    def "save - Insert new entity with null EntityId"() {
+    def "save - Insert new entity with null UniqueKey"() {
         given:
             assert repository.count() == 3
             assert repository.findById(5).isEmpty()

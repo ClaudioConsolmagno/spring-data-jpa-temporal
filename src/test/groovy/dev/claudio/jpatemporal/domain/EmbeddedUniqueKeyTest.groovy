@@ -28,7 +28,7 @@ class EmbeddedUniqueKeyTest extends Specification {
         repositoryWithEmbeddedUniqueKeyJpa.deleteAll()
     }
 
-    def "Can use @EntityId on an @Embedded object as key"() {
+    def "Can use @UniqueKey on an @Embedded object as key"() {
         given:
             def homer = new EmployeeWithEmbeddedUniqueKey(employeeKey: new EmployeeKey(employee_id: 1, employee_id_pt_2: 100), name: 'Homer Simpson')
             def marge = new EmployeeWithEmbeddedUniqueKey(employeeKey: new EmployeeKey(employee_id: 1, employee_id_pt_2: 200), name: 'Marge Bouvier')

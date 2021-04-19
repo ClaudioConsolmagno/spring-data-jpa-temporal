@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
 class AnnotatedAttributes<T> {
     private static final Set<Class<? extends Annotation>> RELATIONAL_ANNOTATIONS = Set.of(OneToOne.class, OneToMany.class, ManyToOne.class, ManyToMany.class);
 
-    @Getter private final String entityId;
+    @Getter private final String uniqueKey;
     @Getter private final String temporalId;
     @Getter private final String fromDate;
     @Getter private final String toDate;
@@ -39,14 +39,14 @@ class AnnotatedAttributes<T> {
 
     public AnnotatedAttributes(final Class<T> domainClass) {
         validateNoRelationalAnnotations(domainClass);
-        this.entityId = fetchAnnotatedField(domainClass, UniqueKey.class);
+        this.uniqueKey = fetchAnnotatedField(domainClass, UniqueKey.class);
         this.temporalId = fetchAnnotatedField(domainClass, TemporalId.class);
         this.fromDate = fetchAnnotatedField(domainClass, FromDate.class);
         this.toDate = fetchAnnotatedField(domainClass, ToDate.class);
         try {
             PropertyDescriptor[] propertyDescriptors = Introspector.getBeanInfo(domainClass, Object.class).getPropertyDescriptors();
             this.attributeToPropertyDescriptor = Arrays.stream(propertyDescriptors)
-                    .filter(it -> Set.of(entityId, temporalId, fromDate, toDate).contains(it.getName()))
+                    .filter(it -> Set.of(uniqueKey, temporalId, fromDate, toDate).contains(it.getName()))
                     .collect(Collectors.toMap(FeatureDescriptor::getName, it -> it));
         } catch (IntrospectionException e) {
             throw new RuntimeException("Could not create PropertyDescriptors for " + domainClass, e);
@@ -98,20 +98,20 @@ class AnnotatedAttributes<T> {
             }
             throw new RuntimeException("Should have a single annotation '" + annotation.getSimpleName() + "' on " + domainClass + " or its child");
         }
-        String entityIdName;
+        String fieldName;
         Optional<Column> columnAnnotation;
         if (annotatedFields.isEmpty()) {
-            entityIdName = annotatedMethods.get(0).getName();
-            entityIdName = entityIdName.startsWith("get") ? entityIdName.replaceFirst("get", "").toLowerCase(Locale.ROOT) : entityIdName;
+            fieldName = annotatedMethods.get(0).getName();
+            fieldName = fieldName.startsWith("get") ? fieldName.replaceFirst("get", "").toLowerCase(Locale.ROOT) : fieldName;
             columnAnnotation = Optional.ofNullable(annotatedMethods.get(0).getAnnotation(Column.class));
         } else {
-            entityIdName = annotatedFields.get(0).getName();
+            fieldName = annotatedFields.get(0).getName();
             columnAnnotation = Optional.ofNullable(annotatedFields.get(0).getAnnotation(Column.class));
         }
         return columnAnnotation
                 .map(Column::name)
                 .filter(it -> !it.isBlank())
-                .orElse(entityIdName);
+                .orElse(fieldName);
     }
 
     private List<Method> fetchAnnotatedMethods(final Class<? super T> domainClass, final Class<? extends Annotation> annotation) {

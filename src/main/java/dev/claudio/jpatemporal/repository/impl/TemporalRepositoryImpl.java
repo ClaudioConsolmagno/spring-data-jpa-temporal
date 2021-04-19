@@ -100,7 +100,7 @@ public class TemporalRepositoryImpl<T, ID> extends SimpleJpaRepository<T, ID> im
     @NonNull
     @Override
     public Optional<T> findById(@NonNull final ID id) {
-        return super.findOne((root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get(annotatedAttributes.getEntityId()), id));
+        return super.findOne((root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get(annotatedAttributes.getUniqueKey()), id));
     }
 
     @Override
@@ -229,7 +229,7 @@ public class TemporalRepositoryImpl<T, ID> extends SimpleJpaRepository<T, ID> im
 
     @NonNull
     protected Predicate inIdPredicate(@NonNull final Iterable<ID> ids, final Root<? extends T> root, final CriteriaBuilder criteriaBuilder) {
-        CriteriaBuilder.In<Object> inClause = criteriaBuilder.in(root.get(annotatedAttributes.getEntityId()));
+        CriteriaBuilder.In<Object> inClause = criteriaBuilder.in(root.get(annotatedAttributes.getUniqueKey()));
         ids.forEach(inClause::value);
         return inClause;
     }
@@ -261,7 +261,7 @@ public class TemporalRepositoryImpl<T, ID> extends SimpleJpaRepository<T, ID> im
 
     @SuppressWarnings("unchecked")
     protected ID getIdFromEntity(final T entity) {
-        return (ID) annotatedAttributes.invokeGetter(annotatedAttributes.getEntityId(), entity);
+        return (ID) annotatedAttributes.invokeGetter(annotatedAttributes.getUniqueKey(), entity);
     }
 
     protected int deleteById(final ID id, final Instant currentTime) {
