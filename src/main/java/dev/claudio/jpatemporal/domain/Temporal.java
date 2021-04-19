@@ -3,24 +3,33 @@ package dev.claudio.jpatemporal.domain;
 import dev.claudio.jpatemporal.annotation.FromDate;
 import dev.claudio.jpatemporal.annotation.TemporalId;
 import dev.claudio.jpatemporal.annotation.ToDate;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
-import java.io.Serializable;
 import java.time.Instant;
 
-@Data
+/**
+ * Abstract base class for temporal entities. This is a convenience base class and is entirely optional to be used.
+ * <p>
+ * When used, the extending class should NOT use this class' {@code hashCode()} and {@code equals()} methods and for
+ * this reason they aren't implemented here.
+ *
+ * @author Claudio Consolmagno
+ */
+@Getter
+@Setter
+@ToString
 @MappedSuperclass
-public abstract class Temporal implements Serializable {
+public abstract class Temporal {
 
     @Id
     @TemporalId
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @EqualsAndHashCode.Exclude
     private Long temporal_id;
 
     @FromDate

@@ -1,9 +1,9 @@
 package dev.claudio.jpatemporal.repository.impl;
 
-import dev.claudio.jpatemporal.annotation.EntityId;
 import dev.claudio.jpatemporal.annotation.FromDate;
 import dev.claudio.jpatemporal.annotation.TemporalId;
 import dev.claudio.jpatemporal.annotation.ToDate;
+import dev.claudio.jpatemporal.annotation.UniqueKey;
 import lombok.Getter;
 import org.springframework.util.ReflectionUtils;
 
@@ -39,7 +39,7 @@ class AnnotatedAttributes<T> {
 
     public AnnotatedAttributes(final Class<T> domainClass) {
         validateNoRelationalAnnotations(domainClass);
-        this.entityId = fetchAnnotatedField(domainClass, EntityId.class);
+        this.entityId = fetchAnnotatedField(domainClass, UniqueKey.class);
         this.temporalId = fetchAnnotatedField(domainClass, TemporalId.class);
         this.fromDate = fetchAnnotatedField(domainClass, FromDate.class);
         this.toDate = fetchAnnotatedField(domainClass, ToDate.class);

@@ -31,7 +31,7 @@ import java.util.stream.StreamSupport;
 
 /**
  * Default implementation of the {@link TemporalRepository} interface.
- *
+ * <p>
  * This implementation extends {@link SimpleJpaRepository} overriding the required methods so that all save/delete
  * queries don't remove data from the database and instead use "from" and "to date" attributes to keep track of what's
  * been delete and what's current. Find/exist queries are also overridden in order for them to use those same attributes

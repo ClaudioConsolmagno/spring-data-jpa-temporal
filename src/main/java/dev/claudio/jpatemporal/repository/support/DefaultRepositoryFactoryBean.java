@@ -1,36 +1,60 @@
 package dev.claudio.jpatemporal.repository.support;
 
 import dev.claudio.jpatemporal.repository.TemporalRepository;
-import org.springframework.data.jpa.repository.JpaRepository;
+import dev.claudio.jpatemporal.repository.impl.TemporalRepositoryImpl;
+import org.springframework.data.jpa.repository.support.JpaRepositoryFactory;
 import org.springframework.data.jpa.repository.support.JpaRepositoryFactoryBean;
+import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
+import org.springframework.data.repository.Repository;
+import org.springframework.data.repository.core.RepositoryMetadata;
 import org.springframework.data.repository.core.support.RepositoryFactorySupport;
+import org.springframework.data.repository.query.QueryLookupStrategy;
+import org.springframework.data.repository.query.QueryMethodEvaluationContextProvider;
 import org.springframework.lang.NonNull;
 
 import javax.persistence.EntityManager;
-import java.io.Serializable;
+import java.util.Optional;
 
-public class DefaultRepositoryFactoryBean<T extends JpaRepository<S, ID>, S, ID extends Serializable>
+/**
+ * Adapter to setup implementation {@link TemporalRepositoryImpl} against interface {@link TemporalRepository}.
+ * Repositories that don't extend {@link TemporalRepository} use instead whatever implementation is defined by the base
+ * class {@link JpaRepositoryFactoryBean} (usually {@link SimpleJpaRepository})
+ *
+ * @param <T> the type of the repository
+ */
+public class DefaultRepositoryFactoryBean<T extends Repository<S, ID>, S, ID>
         extends JpaRepositoryFactoryBean<T, S, ID> {
 
-    private final Class<? extends T> repositoryInterface;
+    private final boolean isTemporalRepository;
 
-    /**
-     * Creates a new {@link JpaRepositoryFactoryBean} for the given repository interface.
-     *
-     * @param repositoryInterface must not be {@literal null}.
-     */
     public DefaultRepositoryFactoryBean(final Class<? extends T> repositoryInterface) {
         super(repositoryInterface);
-        this.repositoryInterface = repositoryInterface;
+        this.isTemporalRepository = TemporalRepository.class.isAssignableFrom(repositoryInterface);
     }
 
-    @Override
     @NonNull
+    @Override
     protected RepositoryFactorySupport createRepositoryFactory(@NonNull final EntityManager entityManager) {
-        if (TemporalRepository.class.isAssignableFrom(repositoryInterface)) {
-            return new DefaultRepositoryFactory(entityManager);
-        } else {
-            return super.createRepositoryFactory(entityManager);
+        return isTemporalRepository
+                ? new DefaultRepositoryFactory(entityManager)
+                : super.createRepositoryFactory(entityManager);
+    }
+
+    static class DefaultRepositoryFactory extends JpaRepositoryFactory {
+        public DefaultRepositoryFactory(final EntityManager entityManager) {
+            super(entityManager);
+        }
+
+        @NonNull
+        @Override
+        protected Class<?> getRepositoryBaseClass(@NonNull RepositoryMetadata metadata) {
+            return TemporalRepositoryImpl.class;
+        }
+
+        @NonNull
+        @Override
+        protected Optional<QueryLookupStrategy> getQueryLookupStrategy(final QueryLookupStrategy.Key key, @NonNull final QueryMethodEvaluationContextProvider evaluationContextProvider) {
+            return super.getQueryLookupStrategy(QueryLookupStrategy.Key.USE_DECLARED_QUERY, evaluationContextProvider);
         }
     }
 }

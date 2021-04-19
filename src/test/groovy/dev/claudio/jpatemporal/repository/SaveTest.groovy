@@ -54,8 +54,8 @@ class SaveTest extends BaseTestSpecification {
             assert repository.findById(1).get() == homerLatestJob()
         when:
             def saved = saveAndFlush
-                ? repository.save(homerLatestJob().tap {job = "Astronaut"})
-                : repository.saveAndFlush(homerLatestJob().tap {job = "Astronaut"})
+                ? repository.save(homerLatestJob().tap {job = "Astronaut"; from_date = null})
+                : repository.saveAndFlush(homerLatestJob().tap {job = "Astronaut"; from_date = null})
         then:
             saved == homerLatestJob()
             repository.findById(1).get() == homerLatestJob()
@@ -68,8 +68,8 @@ class SaveTest extends BaseTestSpecification {
             assert repository.findById(1).get() == homerLatestJob()
         when:
             def saved = saveAndFlush
-                ? repository.save(homerLatestJob().tap {job = "Bartender"})
-                : repository.saveAndFlush(homerLatestJob().tap {job = "Bartender"})
+                ? repository.save(homerLatestJob().tap {job = "Bartender"; from_date = null})
+                : repository.saveAndFlush(homerLatestJob().tap {job = "Bartender"; from_date = null})
         then:
             saved != homerLatestJob()
             saved == repository.findById(1).get()
@@ -83,7 +83,7 @@ class SaveTest extends BaseTestSpecification {
             assert repository.findById(1).get() == homerLatestJob()
             assert repository.findById(5).isEmpty()
         when:
-            def savedList = repository.saveAll([bartJob(), homerLatestJob().tap {job = "Bartender"}])
+            def savedList = repository.saveAll([bartJob(), homerLatestJob().tap {job = "Bartender"; from_date = null}])
         then:
             def saved1 = repository.findById(1).get()
             def saved5 = repository.findById(5).get()

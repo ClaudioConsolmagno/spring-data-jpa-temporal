@@ -18,20 +18,20 @@ public class RevisionMetadataImpl<T, N extends Number & Comparable<N>> implement
         this.timestamp = timestamp;
     }
 
-    @Override
     @NonNull
+    @Override
     public Optional<N> getRevisionNumber() {
         return Optional.of(revisionNumber);
     }
 
-    @Override
     @NonNull
+    @Override
     public Optional<Instant> getRevisionInstant() {
         return Optional.of(timestamp);
     }
 
-    @Override
     @NonNull
+    @Override
     @SuppressWarnings("unchecked")
     public <S> S getDelegate() {
         return (S) entity;

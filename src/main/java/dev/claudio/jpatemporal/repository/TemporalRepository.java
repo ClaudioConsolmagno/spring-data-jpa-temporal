@@ -1,6 +1,5 @@
 package dev.claudio.jpatemporal.repository;
 
-import dev.claudio.jpatemporal.annotation.ToDate;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -13,22 +12,24 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * A temporal repository extension of {@link JpaRepository}, {@link JpaSpecificationExecutor} and {@link RevisionRepository}.
- *
+ * A temporal repository extension of {@link org.springframework.data.jpa.repository.JpaRepository},
+ * {@link org.springframework.data.jpa.repository.JpaSpecificationExecutor} and
+ * {@link org.springframework.data.repository.history.RevisionRepository}.
+ * <p>
  * The repository transparently keeps audit of the data on save/delete while find/count always returns the latest data.
- *
+ * <p>
  * Audit can be retrieved using the methods defined in this interface or via {@link RevisionRepository} methods.
  *
- * @param <T> the type of the entity to handle
- * @param <ID> the type of the entity's identifier
+ * @param <T>  the type of the entity to handle
+ * @param <ID> the type of the entity's identifier (referenced by {@link dev.claudio.jpatemporal.annotation.UniqueKey}
  * @author Claudio Consolmagno
  */
 @NoRepositoryBean
 public interface TemporalRepository<T, ID> extends JpaRepository<T, ID>, JpaSpecificationExecutor<T>, RevisionRepository<T, ID, Integer> {
 
     /**
-     * A date far into the future that represents "infinity" time which is used by {@link ToDate} to denote that an
-     * entity is current and has not been deleted.
+     * A date far into the future that represents "infinity" time which is used by
+     * {@link dev.claudio.jpatemporal.annotation.ToDate} to denote that an entity is current and has not been deleted.
      */
     Instant MAX_INSTANT = Instant.parse("9999-01-01T00:00:00.000Z");
 
