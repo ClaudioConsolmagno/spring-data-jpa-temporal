@@ -116,6 +116,7 @@ public class TemporalRepositoryImpl<T, ID> extends SimpleJpaRepository<T, ID> im
 
     @NonNull
     @Override
+    @Deprecated
     public T getOne(@NonNull final ID id) {
         return this.findById(id).orElseThrow(EntityNotFoundException::new);
     }
@@ -162,12 +163,26 @@ public class TemporalRepositoryImpl<T, ID> extends SimpleJpaRepository<T, ID> im
     }
 
     @Override
-    public void deleteInBatch(@NonNull final Iterable<T> entities) {
+    public void deleteAllInBatch(@NonNull final Iterable<T> entities) {
         Set<ID> idsToDelete = StreamSupport.stream(entities.spliterator(), false)
                 .map(this::getIdFromEntity)
                 .collect(Collectors.toSet());
         if (idsToDelete.isEmpty()) return;
         this.deleteByIds(idsToDelete, Instant.now());
+    }
+
+    @Override
+    public void deleteAllByIdInBatch(@NonNull final Iterable<ID> ids) {
+        Set<ID> idsToDelete = StreamSupport.stream(ids.spliterator(), false)
+                .collect(Collectors.toSet());
+        if (idsToDelete.isEmpty()) return;
+        this.deleteByIds(idsToDelete, Instant.now());
+    }
+
+    @Override
+    @Deprecated
+    public void deleteInBatch(@NonNull final Iterable<T> entities) {
+        this.deleteAllInBatch(entities);
     }
 
     @Override
