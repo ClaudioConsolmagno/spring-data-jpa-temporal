@@ -42,7 +42,7 @@ import java.util.stream.StreamSupport;
 @NoRepositoryBean
 public class TemporalRepositoryImpl<T, ID> extends SimpleJpaRepository<T, ID> implements TemporalRepository<T, ID> {
 
-    private final AnnotatedAttributes<T> annotatedAttributes;
+    private final AnnotatedEntitySupport<T> annotatedEntitySupport;
     private final JpaEntityInformation<T, ID> entityInformation;
     private final EntityManager em;
 
@@ -50,7 +50,7 @@ public class TemporalRepositoryImpl<T, ID> extends SimpleJpaRepository<T, ID> im
         super(entityInformation, em);
         this.entityInformation = entityInformation;
         this.em = em;
-        this.annotatedAttributes = new AnnotatedAttributes<>(this.getDomainClass());
+        this.annotatedEntitySupport = new AnnotatedEntitySupport<>(this.getDomainClass());
     }
 
     /******************************************************************************************************************
@@ -100,7 +100,7 @@ public class TemporalRepositoryImpl<T, ID> extends SimpleJpaRepository<T, ID> im
     @NonNull
     @Override
     public Optional<T> findById(@NonNull final ID id) {
-        return super.findOne((root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get(annotatedAttributes.getUniqueKey()), id));
+        return super.findOne((root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get(annotatedEntitySupport.getUniqueKey()), id));
     }
 
     @Override
@@ -136,9 +136,9 @@ public class TemporalRepositoryImpl<T, ID> extends SimpleJpaRepository<T, ID> im
         }
         var currentTime = Instant.now();
         deleteById(id, currentTime);
-        annotatedAttributes.invokeSetter(annotatedAttributes.getFromDate(), entity, currentTime);
-        annotatedAttributes.invokeSetter(annotatedAttributes.getToDate(), entity, MAX_INSTANT);
-        annotatedAttributes.invokeSetter(annotatedAttributes.getTemporalId(), entity, null);
+        annotatedEntitySupport.setAttribute(annotatedEntitySupport.getFromDate(), entity, currentTime);
+        annotatedEntitySupport.setAttribute(annotatedEntitySupport.getToDate(), entity, MAX_INSTANT);
+        annotatedEntitySupport.setAttribute(annotatedEntitySupport.getTemporalId(), entity, null);
         return super.save(entity);
     }
 
@@ -229,7 +229,7 @@ public class TemporalRepositoryImpl<T, ID> extends SimpleJpaRepository<T, ID> im
 
     @NonNull
     protected Predicate inIdPredicate(@NonNull final Iterable<ID> ids, final Root<? extends T> root, final CriteriaBuilder criteriaBuilder) {
-        CriteriaBuilder.In<Object> inClause = criteriaBuilder.in(root.get(annotatedAttributes.getUniqueKey()));
+        CriteriaBuilder.In<Object> inClause = criteriaBuilder.in(root.get(annotatedEntitySupport.getUniqueKey()));
         ids.forEach(inClause::value);
         return inClause;
     }
@@ -245,11 +245,11 @@ public class TemporalRepositoryImpl<T, ID> extends SimpleJpaRepository<T, ID> im
             return criteriaBuilder.conjunction();
         }
         if (asOfInstant.equals(MAX_INSTANT)) {
-            return criteriaBuilder.equal(root.get(annotatedAttributes.getToDate()), MAX_INSTANT);
+            return criteriaBuilder.equal(root.get(annotatedEntitySupport.getToDate()), MAX_INSTANT);
         }
         return criteriaBuilder.and(
-                criteriaBuilder.lessThanOrEqualTo(root.get(annotatedAttributes.getFromDate()), asOfInstant),
-                criteriaBuilder.greaterThan(root.get(annotatedAttributes.getToDate()), asOfInstant)
+                criteriaBuilder.lessThanOrEqualTo(root.get(annotatedEntitySupport.getFromDate()), asOfInstant),
+                criteriaBuilder.greaterThan(root.get(annotatedEntitySupport.getToDate()), asOfInstant)
         );
     }
 
@@ -261,7 +261,7 @@ public class TemporalRepositoryImpl<T, ID> extends SimpleJpaRepository<T, ID> im
 
     @SuppressWarnings("unchecked")
     protected ID getIdFromEntity(final T entity) {
-        return (ID) annotatedAttributes.invokeGetter(annotatedAttributes.getUniqueKey(), entity);
+        return (ID) annotatedEntitySupport.getAttribute(annotatedEntitySupport.getUniqueKey(), entity);
     }
 
     protected int deleteById(final ID id, final Instant currentTime) {
@@ -280,7 +280,7 @@ public class TemporalRepositoryImpl<T, ID> extends SimpleJpaRepository<T, ID> im
         predicates.add(toAndFromPredicate(MAX_INSTANT, root, criteriaBuilder));
         if (ids != null) predicates.add(inIdPredicate(ids, root, criteriaBuilder));
 
-        criteriaUpdate.set(root.get(annotatedAttributes.getToDate()), currentTime)
+        criteriaUpdate.set(root.get(annotatedEntitySupport.getToDate()), currentTime)
                 .where(predicates.toArray(new Predicate[0]));
         return em.createQuery(criteriaUpdate).executeUpdate();
     }
@@ -290,7 +290,7 @@ public class TemporalRepositoryImpl<T, ID> extends SimpleJpaRepository<T, ID> im
         List<Revision<Integer, T>> metadataList = new ArrayList<>();
         for (int i = 0; i < allByIdAsOf.size(); i++) {
             T entity = allByIdAsOf.get(i);
-            Instant timestamp = (Instant) annotatedAttributes.invokeGetter(annotatedAttributes.getFromDate(), entity);
+            Instant timestamp = (Instant) annotatedEntitySupport.getAttribute(annotatedEntitySupport.getFromDate(), entity);
             RevisionMetadataImpl<T, Integer> metadata = new RevisionMetadataImpl<>(entity, i + 1, timestamp);
             metadataList.add(Revision.of(metadata, entity));
         }

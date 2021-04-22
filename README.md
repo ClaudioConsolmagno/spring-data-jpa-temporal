@@ -22,10 +22,7 @@ More specifically, your table becomes a "system-version table". The following ex
 
 # Usage
 
-Take a look at the sample springboot application at [src/test/java](src/test/java) directory. It shows the simplest usage of this extension. He's a step-by-step summary of what you need:
-
-### build.gradle / pom.xml
-1. Look at the latest release version in github and add a dependency to your build file:
+Look at the latest release `${version}` in github and add a dependency to your build file:
 
 Maven:
 ```xml
@@ -41,28 +38,32 @@ Gradle:
 implementation 'dev.claudio:spring-data-jpa-temporal:${version}'
 ```
 
+As a quick-start, take a look at the sample springboot application in the [src/test/java](src/test/java) directory. It shows the simplest usage of this extension. For extra information and alternative usage here's a step-by-step summary of what you need:
+
 ### Spring main class (e.g. [SpringDataJpaTemporalApplication.java](src/test/java/dev/claudio/jpatemporal/SpringDataJpaTemporalApplication.java))
 
-2. Use `@EnableJpaTemporalRepositories` (see `SpringDataJpaTemporalApplication.java`).
-   This makes this extension work, and that it _only_ works on repositories that extend `TemporalRepository.java` (step 6 below).
-   Alternatively, you can use `@EnableJpaRepositories(repositoryFactoryBeanClass = DefaultRepositoryFactoryBean.class)` if you need to configure something else in the JPA annotation.
+Use `@EnableJpaTemporalRepositories` (see `SpringDataJpaTemporalApplication.java`).
+This makes this extension work, and that it _only_ works on repositories that extend `TemporalRepository.java` (see below).
+Alternatively, you can use `@EnableJpaRepositories(repositoryFactoryBeanClass = DefaultRepositoryFactoryBean.class)` if you need to configure something else for your regular JPA repositories.
 
 ### Entity (e.g. [Employee.java](src/test/java/dev/claudio/jpatemporal/domain/Employee.java))
 
-3. From your domain class (e.g. `Employee.java`), extend `Temporal.java`. Alternatively, use annotations `@TemporalId`, `@FromDate` and `@ToDate` in fields of your class.
+From your domain class (e.g. `Employee.java`), extend `Temporal.java`. Alternatively, use annotations `@TemporalId`, `@FromDate` and `@ToDate` in fields of your class.
    `@TemporalId` must be your primary key so it needs to have `@Id` and `@GeneratedValue` on the same field.
-4. Use `@UniqueKey` on your unique key attribute in your entity (e.g. `employee_id`).
-5. If you are using Lombok and are extending `Temporal.java` mark your entity with `@EqualsAndHashCode(callSuper = false)`.
+
+Use `@UniqueKey` on your unique key attribute in your entity (e.g. `employee_id`).
+
+If you are using Lombok and are extending `Temporal.java` mark your entity with `@EqualsAndHashCode(callSuper = false)`.
    If not, make sure your equals and hashcode implementations don't use any of the values marked with `@TemporalId`, `@FromDate` and `@ToDate`.
 
 ### Repository (e.g. [Repository.java](src/test/java/dev/claudio/jpatemporal/repository/Repository.java))
 
-6. Create a repository interface that extends `TemporalRepository<T,ID>`. `T` is your entity and `ID` is the type of your unique key (marked with `@UniqueKey`).
+Create a repository interface that extends `TemporalRepository<T,ID>`. `T` is your entity and `ID` is the type of your unique key (marked with `@UniqueKey`).
    Example `extends TemporalRepository<Employee, Integer>`
 
 ### Database schema (e.g. [db.sql](src/test/resources/db.sql))
 
-7. For better query performance create a unique index on your `@UniqueKey` and `@ToDate` columns. E.g. `create unique index employee_id_to_date_index on employee (employee_id, to_date);`
+For better query performance create a unique index on your `@UniqueKey` and `@ToDate` columns. E.g. `create unique index employee_id_to_date_index on employee (employee_id, to_date);`
 
 # Alternatives
 
@@ -85,9 +86,6 @@ The following 2 functionalities aren't currently supported with this library. An
 
 # Next Steps
 
-- [ ] Remove dependency on `org.springframework.util.ReflectionUtils` (comment on class says it's for internal use only)
-  - [x] Maybe use AnnotationDetectionMethodCallback and AnnotationDetectionFieldCallback - nope
-  - [ ] Maybe use AnnotatedElementUtils
 - [ ] Publish to Maven
   - [ ] https://docs.gradle.org/current/userguide/building_java_projects.html#sec:building_java_libraries
   - [ ] 8 Only? Multi version (8 - 11 - 16) jar?

@@ -97,8 +97,8 @@ class SaveTest extends BaseTestSpecification {
         assert employee.employee_id == employee_id
         assert employee.name == name
         assert employee.job == job
-        assert employee.from_date.isAfter(testStartTime)
-        assert employee.from_date.isBefore(Instant.now())
+        assert employee.from_date.isAfter(testStartTime.plusMillis(-1))
+        assert employee.from_date.isBefore(Instant.now().plusMillis(1))
         assert employee.to_date == MAX_INSTANT
         return true
     }
