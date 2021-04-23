@@ -1,0 +1,68 @@
+java {
+	withJavadocJar()
+	withSourcesJar()
+}
+
+javadoc {
+	options.addStringOption('Xdoclint:-missing', '-quiet')
+	options.addBooleanOption('html5', true)
+}
+
+jar {
+	manifest {
+		attributes(
+			'Group'          : "${project.rootProject.group}",
+			'Artifact'       : "${project.rootProject.name}",
+			'Version'        : "${project.rootProject.version}",
+			'Build-Timestamp': new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ").format(new Date()),
+			'Created-By'     : "Gradle ${gradle.gradleVersion}",
+			'Build-Jdk'      : "${System.properties['java.version']} (${System.properties['java.vendor']} ${System.properties['java.vm.version']})",
+			'Build-OS'       : "${System.properties['os.name']} ${System.properties['os.arch']} ${System.properties['os.version']}",
+			'Multi-Release'  : false
+		)
+	}
+}
+
+// https://docs.gradle.org/current/userguide/signing_plugin.html#signing_plugin
+//signing {
+//	sign publishing.publications.maven
+//}
+
+publishing {
+	publications {
+		maven(MavenPublication) {
+			from components.java
+			pom {
+				name = 'Spring Data JPA Temporal Audit'
+				description = 'Temporal auditing extension of the Spring Data JPA module '
+				url = 'https://github.com/ClaudioConsolmagno/spring-data-jpa-temporal'
+				licenses {
+					license {
+						name = 'The Apache License, Version 2.0'
+						url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+					}
+				}
+				developers {
+					developer {
+						id = 'ClaudioConsolmagno'
+						name = 'Claudio Consolmagno'
+						url = 'https://claudio.dev'
+					}
+				}
+				scm {
+					connection = 'scm:git:git://github.com/ClaudioConsolmagno/spring-data-jpa-temporal.git'
+					developerConnection = 'scm:git:ssh://github.com/ClaudioConsolmagno/spring-data-jpa-temporal.git'
+					url = 'https://github.com/ClaudioConsolmagno/spring-data-jpa-temporal'
+				}
+			}
+		}
+	}
+	repositories {
+		maven {
+			// change URLs to point to your repos, e.g. http://my.org/repo
+			def releasesRepoUrl = layout.buildDirectory.dir('repos/releases')
+			def snapshotsRepoUrl = layout.buildDirectory.dir('repos/snapshots')
+			url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+		}
+	}
+}

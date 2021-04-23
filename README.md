@@ -87,9 +87,8 @@ The following 2 functionalities aren't currently supported with this library. An
 # Next Steps
 
 - [ ] Publish to Maven
-  - [ ] https://docs.gradle.org/current/userguide/building_java_projects.html#sec:building_java_libraries
   - [ ] 8 Only? Multi version (8 - 11 - 16) jar?
-  - [ ] Switch build to pom.xml?
+  - [ ] Jar signing
 - [ ] Add checkstyle/spotbugs, static code analysis
 - [ ] Extra unit tests on:
   - [ ] Annotated fields and methods (i.e. entity doesn't extend `Temporal.java`)
