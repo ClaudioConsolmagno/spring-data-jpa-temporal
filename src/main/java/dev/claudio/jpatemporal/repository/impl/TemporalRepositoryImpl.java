@@ -1,6 +1,7 @@
 package dev.claudio.jpatemporal.repository.impl;
 
 import dev.claudio.jpatemporal.repository.TemporalRepository;
+import lombok.val;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -23,6 +24,7 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -61,7 +63,7 @@ public class TemporalRepositoryImpl<T, ID> extends SimpleJpaRepository<T, ID> im
 
     @Override
     public Optional<T> findById(@NonNull final ID id, @NonNull final Instant asOfInstant) {
-        return findAllById(List.of(id), asOfInstant).stream().findFirst();
+        return findAllById(Collections.singletonList(id), asOfInstant).stream().findFirst();
     }
 
     @Override
@@ -135,7 +137,7 @@ public class TemporalRepositoryImpl<T, ID> extends SimpleJpaRepository<T, ID> im
         if (existingEntity.isPresent() && existingEntity.get().equals(entity)) {
             return entity;
         }
-        var currentTime = Instant.now();
+        val currentTime = Instant.now();
         deleteById(id, currentTime);
         annotatedEntitySupport.setAttribute(annotatedEntitySupport.getFromDate(), entity, currentTime);
         annotatedEntitySupport.setAttribute(annotatedEntitySupport.getToDate(), entity, MAX_INSTANT);
@@ -208,7 +210,7 @@ public class TemporalRepositoryImpl<T, ID> extends SimpleJpaRepository<T, ID> im
     @Override
     @NonNull
     public Optional<Revision<Integer, T>> findLastChangeRevision(@NonNull final ID id) {
-        var revisions = findRevisionsList(id);
+        val revisions = findRevisionsList(id);
         return Optional.ofNullable(revisions.size() > 0 ? revisions.get(revisions.size() - 1) : null);
     }
 
@@ -227,7 +229,7 @@ public class TemporalRepositoryImpl<T, ID> extends SimpleJpaRepository<T, ID> im
     @Override
     @NonNull
     public Optional<Revision<Integer, T>> findRevision(@NonNull final ID id, @NonNull final Integer revisionNumber) {
-        var revisions = findRevisionsList(id);
+        val revisions = findRevisionsList(id);
         return Optional.ofNullable((revisionNumber > 0 && revisions.size() >= revisionNumber) ? revisions.get(revisionNumber-1) : null);
     }
 
@@ -283,15 +285,15 @@ public class TemporalRepositoryImpl<T, ID> extends SimpleJpaRepository<T, ID> im
         if (id == null) {
             throw new JpaSystemException(new RuntimeException("ids for this class must be manually assigned before calling save/delete: " + this.getDomainClass().getName()));
         }
-        return deleteByIds(Set.of(id), currentTime);
+        return deleteByIds(Collections.singleton(id), currentTime);
     }
 
     protected int deleteByIds(final Set<ID> ids, final Instant currentTime) {
-        var criteriaBuilder = em.getCriteriaBuilder();
-        var criteriaUpdate = criteriaBuilder.createCriteriaUpdate(this.getDomainClass());
-        var root = criteriaUpdate.from(this.getDomainClass());
+        val criteriaBuilder = em.getCriteriaBuilder();
+        val criteriaUpdate = criteriaBuilder.createCriteriaUpdate(this.getDomainClass());
+        val root = criteriaUpdate.from(this.getDomainClass());
 
-        var predicates = new ArrayList<Predicate>();
+        val predicates = new ArrayList<Predicate>();
         predicates.add(toAndFromPredicate(MAX_INSTANT, root, criteriaBuilder));
         if (ids != null) predicates.add(inIdPredicate(ids, root, criteriaBuilder));
 
@@ -301,7 +303,7 @@ public class TemporalRepositoryImpl<T, ID> extends SimpleJpaRepository<T, ID> im
     }
 
     protected List<Revision<Integer, T>> findRevisionsList(@NonNull final ID id) {
-        List<T> allByIdAsOf = findAllById(List.of(id), null);
+        List<T> allByIdAsOf = findAllById(Collections.singletonList(id), null);
         List<Revision<Integer, T>> metadataList = new ArrayList<>();
         for (int i = 0; i < allByIdAsOf.size(); i++) {
             T entity = allByIdAsOf.get(i);

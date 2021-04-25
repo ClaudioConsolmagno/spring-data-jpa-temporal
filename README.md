@@ -87,7 +87,6 @@ The following 2 functionalities aren't currently supported with this library. An
 # Next Steps
 
 - [ ] Publish to Maven
-  - [ ] 8 Only? Multi version (8 - 11 - 16) jar?
 - [ ] Add checkstyle/spotbugs, static code analysis
 - [ ] Extra unit tests on:
   - [ ] Annotated fields and methods (i.e. entity doesn't extend `Temporal.java`)

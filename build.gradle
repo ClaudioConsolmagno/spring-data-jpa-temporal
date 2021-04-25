@@ -9,12 +9,11 @@ plugins {
 
 group = 'dev.claudio'
 version = '0.0.1-SNAPSHOT'
-targetCompatibility = '16'
 
 apply from: 'maven-publishing.gradle'
 
 compileJava {
-	options.release = 11
+	options.release = 8
 	options.compilerArgs << '-Xlint:all'
 }
 

@@ -15,7 +15,9 @@ import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.BiConsumer;
@@ -23,7 +25,9 @@ import java.util.function.Function;
 
 class AnnotatedEntitySupport<T> {
     private static final Set<Class<? extends Annotation>> RELATIONAL_ANNOTATIONS =
-            Set.of(OneToOne.class, OneToMany.class, ManyToOne.class, ManyToMany.class);
+            Collections.unmodifiableSet(new HashSet<>(
+                    Arrays.asList(OneToOne.class, OneToMany.class, ManyToOne.class, ManyToMany.class)
+            ));
 
     private final Map<String, Function<T, Object>> readMethod = new HashMap<>();
     private final Map<String, BiConsumer<T, Object>> writeMethod = new HashMap<>();
@@ -41,7 +45,7 @@ class AnnotatedEntitySupport<T> {
         this.toDate = ReflectionUtils.fetchAnnotatedField(domainClass, ToDate.class);
         try {
             Arrays.stream(Introspector.getBeanInfo(domainClass, Object.class).getPropertyDescriptors())
-                    .filter(it -> Set.of(uniqueKey, temporalId, fromDate, toDate).contains(it.getName()))
+                    .filter(it -> Arrays.asList(uniqueKey, temporalId, fromDate, toDate).contains(it.getName()))
                     .forEach(it -> {
                         readMethod.put(it.getName(), createGetterFunction(it));
                         writeMethod.put(it.getName(), createSetterFunction(it));

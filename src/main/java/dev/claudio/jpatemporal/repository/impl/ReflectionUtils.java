@@ -34,7 +34,7 @@ final class ReflectionUtils {
         }
         return columnAnnotation
                 .map(Column::name)
-                .filter(it -> !it.isBlank())
+                .filter(it -> !it.isEmpty())
                 .orElse(fieldName);
     }
 
