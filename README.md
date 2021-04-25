@@ -88,13 +88,13 @@ The following 2 functionalities aren't currently supported with this library. An
 
 - [ ] Publish to Maven
   - [ ] 8 Only? Multi version (8 - 11 - 16) jar?
-  - [ ] Jar signing
 - [ ] Add checkstyle/spotbugs, static code analysis
 - [ ] Extra unit tests on:
   - [ ] Annotated fields and methods (i.e. entity doesn't extend `Temporal.java`)
   - [ ] Fields without getters and setters
   - [ ] Test @Query annotation on repository methods.
   - [ ] Test on AnnotatedAttributes.java
+- [ ] Java 9 modules?
 - [ ] Work on limitations (section above)
   - Maybe listeners can help solve relations limitation (e.g. see EnversPreUpdateEventListenerImpl)
 - [ ] Implement `findRevisions(ID, Pageable)`

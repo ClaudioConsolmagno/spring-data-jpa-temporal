@@ -11,6 +11,7 @@ javadoc {
 jar {
 	manifest {
 		attributes(
+			'Automatic-Module-Name' : 'dev.claudio.jpatemporal',
 			'Group'          : "${project.rootProject.group}",
 			'Artifact'       : "${project.rootProject.name}",
 			'Version'        : "${project.rootProject.version}",
@@ -22,11 +23,6 @@ jar {
 		)
 	}
 }
-
-// https://docs.gradle.org/current/userguide/signing_plugin.html#signing_plugin
-//signing {
-//	sign publishing.publications.maven
-//}
 
 publishing {
 	publications {
@@ -59,10 +55,18 @@ publishing {
 	}
 	repositories {
 		maven {
-			// change URLs to point to your repos, e.g. http://my.org/repo
-			def releasesRepoUrl = layout.buildDirectory.dir('repos/releases')
-			def snapshotsRepoUrl = layout.buildDirectory.dir('repos/snapshots')
-			url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+			name = 'mavenCentral'
+			url = version.endsWith('SNAPSHOT') ?
+				'https://s01.oss.sonatype.org/content/repositories/snapshots/' :
+				'https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/'
+			credentials(PasswordCredentials)
 		}
+	}
+}
+
+// https://docs.gradle.org/current/userguide/signing_plugin.html#signing_plugin
+signing {
+	if (project.hasProperty('signing.keyId')){
+		sign publishing.publications.maven
 	}
 }
