@@ -5,12 +5,16 @@ plugins {
 	id 'signing'
 	id 'maven-publish'
 	id 'io.freefair.lombok' version '6.0.0-m2'
+	id 'com.github.spotbugs' version '4.7.0' // https://spotbugs.readthedocs.io/en/stable/gradle.html
+	id 'pmd' // https://docs.gradle.org/current/userguide/pmd_plugin.html
+	id 'checkstyle' // https://checkstyle.sourceforge.io/
 }
 
 group = 'dev.claudio'
-version = '0.1.0'
+version = '0.1.1-SNAPSHOT'
 
 apply from: 'maven-publishing.gradle'
+apply from: 'code-inspection.gradle'
 
 compileJava {
 	options.release = 8
@@ -36,4 +40,7 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-data-jpa:2.4.5'
 
 	testRuntimeOnly 'com.h2database:h2:1.4.200'
+
+	// https://find-sec-bugs.github.io/
+	spotbugsPlugins 'com.h3xstream.findsecbugs:findsecbugs-plugin:1.11.0'
 }

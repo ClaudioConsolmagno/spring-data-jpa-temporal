@@ -1,0 +1,42 @@
+
+///////////////////////// Spotbugs /////////////////////////
+
+spotbugs {
+	effort = 'max'
+}
+spotbugsMain {
+	reports {
+		xml.enabled = false
+		html.enabled = true
+	}
+}
+spotbugsTest.enabled = false
+
+///////////////////////// PMD /////////////////////////
+
+pmdMain {
+	reports {
+		xml.enabled = false
+		html.enabled = true
+	}
+	enabled = false // TODO REMOVE
+}
+pmdTest.enabled = false
+
+///////////////////////// Checkstyle /////////////////////////
+
+// https://gist.github.com/kevinmmarlow/4501f9ad231a9c9495f9
+checkstyle {
+	// from: https://github.com/checkstyle/checkstyle/blob/master/src/main/resources/sun_checks.xml
+	configFile file("${project.rootDir}/src/test/resources/sun_checks.xml") // Checkstyle config location
+
+}
+checkstyleMain {
+	source '/src/main/java'
+	reports {
+		xml.enabled = false
+		html.enabled = true
+	}
+	enabled = false // TODO REMOVE
+}
+checkstyleTest.enabled = false
