@@ -28,6 +28,7 @@ class AnnotatedEntitySupport<T> {
             Collections.unmodifiableSet(new HashSet<>(
                     Arrays.asList(OneToOne.class, OneToMany.class, ManyToOne.class, ManyToMany.class)
             ));
+    private static final int MANDATORY_ANNOTATIONS_COUNT = 4;
 
     private final Map<String, Function<T, Object>> readMethod = new HashMap<>();
     private final Map<String, BiConsumer<T, Object>> writeMethod = new HashMap<>();
@@ -37,7 +38,7 @@ class AnnotatedEntitySupport<T> {
     @Getter private final String fromDate;
     @Getter private final String toDate;
 
-    public AnnotatedEntitySupport(final Class<T> domainClass) {
+    AnnotatedEntitySupport(final Class<T> domainClass) {
         validateNoRelationalAnnotations(domainClass);
         this.uniqueKey = ReflectionUtils.fetchAnnotatedField(domainClass, UniqueKey.class);
         this.temporalId = ReflectionUtils.fetchAnnotatedField(domainClass, TemporalId.class);
@@ -50,7 +51,7 @@ class AnnotatedEntitySupport<T> {
                         readMethod.put(it.getName(), createGetterFunction(it));
                         writeMethod.put(it.getName(), createSetterFunction(it));
                     });
-            if (readMethod.size() != 4 || writeMethod.size() != 4) {
+            if (readMethod.size() != MANDATORY_ANNOTATIONS_COUNT || writeMethod.size() != MANDATORY_ANNOTATIONS_COUNT) {
                 throw new RuntimeException("Could not correctly identify property getters/setters for " + domainClass);
             }
         } catch (IntrospectionException e) {
@@ -69,24 +70,24 @@ class AnnotatedEntitySupport<T> {
     private void validateNoRelationalAnnotations(final Class<?> domainClass) {
         boolean hasRelationalAnnotations = RELATIONAL_ANNOTATIONS.stream()
                 .anyMatch(annotation ->
-                        ReflectionUtils.fetchAnnotatedMethods(domainClass, annotation).size() +
-                        ReflectionUtils.fetchAnnotatedFields(domainClass, annotation).size() > 0
+                        ReflectionUtils.fetchAnnotatedMethods(domainClass, annotation).size()
+                        + ReflectionUtils.fetchAnnotatedFields(domainClass, annotation).size() > 0
                 );
         if (hasRelationalAnnotations) {
             throw new RuntimeException("Relational Annotations are not supported: " + RELATIONAL_ANNOTATIONS);
         }
     }
 
-    private ThrowingFunction<T, Object> createGetterFunction(PropertyDescriptor it) {
-        return it.getReadMethod() != null ?
-                (entity) -> it.getReadMethod().invoke(entity) :
-                (entity) -> ReflectionUtils.getField(it.getName(), entity.getClass()).get(entity);
+    private ThrowingFunction<T, Object> createGetterFunction(final PropertyDescriptor it) {
+        return it.getReadMethod() != null
+                ? (entity) -> it.getReadMethod().invoke(entity)
+                : (entity) -> ReflectionUtils.getField(it.getName(), entity.getClass()).get(entity);
     }
 
-    private ThrowingConsumer<T, Object> createSetterFunction(PropertyDescriptor it) {
-        return it.getWriteMethod() != null ?
-                (entity, value) -> it.getWriteMethod().invoke(entity, value) :
-                (entity, value) -> ReflectionUtils.getField(it.getName(), entity.getClass()).set(entity, value);
+    private ThrowingConsumer<T, Object> createSetterFunction(final PropertyDescriptor it) {
+        return it.getWriteMethod() != null
+                ? (entity, value) -> it.getWriteMethod().invoke(entity, value)
+                : (entity, value) -> ReflectionUtils.getField(it.getName(), entity.getClass()).set(entity, value);
     }
 
     @FunctionalInterface

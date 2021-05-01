@@ -12,7 +12,7 @@ public class RevisionMetadataImpl<T, N extends Number & Comparable<N>> implement
     private final N revisionNumber;
     private final Instant timestamp;
 
-    public RevisionMetadataImpl(T entity, N revisionNumber, Instant timestamp) {
+    public RevisionMetadataImpl(final T entity, final N revisionNumber, final Instant timestamp) {
         this.entity = entity;
         this.revisionNumber = revisionNumber;
         this.timestamp = timestamp;

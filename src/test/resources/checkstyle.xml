@@ -99,13 +99,14 @@
     <module name="TreeWalker">
 
         <!-- Checks for Javadoc comments.                     -->
+        <!-- Customised for spring-data-jpa-temporal -->
         <!-- See https://checkstyle.org/config_javadoc.html -->
-        <module name="InvalidJavadocPosition"/>
-        <module name="JavadocMethod"/>
-        <module name="JavadocType"/>
-        <module name="JavadocVariable"/>
-        <module name="JavadocStyle"/>
-        <module name="MissingJavadocMethod"/>
+<!--        <module name="InvalidJavadocPosition"/>-->
+<!--        <module name="JavadocMethod"/>-->
+<!--        <module name="JavadocType"/>-->
+<!--        <module name="JavadocVariable"/>-->
+<!--        <module name="JavadocStyle"/>-->
+<!--        <module name="MissingJavadocMethod"/>-->
 
         <!-- Checks for Naming Conventions.                  -->
         <!-- See https://checkstyle.org/config_naming.html -->
@@ -125,7 +126,7 @@
         <module name="IllegalImport"/> <!-- defaults to sun.* packages -->
         <module name="RedundantImport"/>
         <module name="UnusedImports">
-            <property name="processJavadoc" value="false"/>
+            <property name="processJavadoc" value="true"/>  <!-- Customised for spring-data-jpa-temporal -->
         </module>
 
         <!-- Checks for Size Violations.                    -->
@@ -156,14 +157,18 @@
         <module name="AvoidNestedBlocks"/>
         <module name="EmptyBlock"/>
         <module name="LeftCurly"/>
-        <module name="NeedBraces"/>
+        <module name="NeedBraces">
+            <property name="allowSingleLineStatement" value="true" /> <!-- Customised for spring-data-jpa-temporal -->
+        </module>
         <module name="RightCurly"/>
 
         <!-- Checks for common coding problems               -->
         <!-- See https://checkstyle.org/config_coding.html -->
         <module name="EmptyStatement"/>
         <module name="EqualsHashCode"/>
-        <module name="HiddenField"/>
+        <module name="HiddenField">
+            <property name="ignoreConstructorParameter" value="true" /> <!-- Customised for spring-data-jpa-temporal -->
+        </module>
         <module name="IllegalInstantiation"/>
         <module name="InnerAssignment"/>
         <module name="MagicNumber"/>
@@ -174,7 +179,7 @@
 
         <!-- Checks for class design                         -->
         <!-- See https://checkstyle.org/config_design.html -->
-        <module name="DesignForExtension"/>
+<!--        <module name="DesignForExtension"/>--> <!-- Customised for spring-data-jpa-temporal -->
         <module name="FinalClass"/>
         <module name="HideUtilityClassConstructor"/>
         <module name="InterfaceIsType"/>
@@ -194,6 +199,8 @@
             <property name="optional" value="true"/>
         </module>
 
+        <module name="SuppressWarningsHolder"/>  <!-- Customised for spring-data-jpa-temporal -->
     </module>
+    <module name="SuppressWarningsFilter"/>  <!-- Customised for spring-data-jpa-temporal -->
 
 </module>

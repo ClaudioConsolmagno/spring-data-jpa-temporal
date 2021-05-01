@@ -41,13 +41,13 @@ public class DefaultRepositoryFactoryBean<T extends Repository<S, ID>, S, ID>
     }
 
     static class DefaultRepositoryFactory extends JpaRepositoryFactory {
-        public DefaultRepositoryFactory(final EntityManager entityManager) {
+        DefaultRepositoryFactory(final EntityManager entityManager) {
             super(entityManager);
         }
 
         @NonNull
         @Override
-        protected Class<?> getRepositoryBaseClass(@NonNull RepositoryMetadata metadata) {
+        protected Class<?> getRepositoryBaseClass(final @NonNull RepositoryMetadata metadata) {
             return TemporalRepositoryImpl.class;
         }
 

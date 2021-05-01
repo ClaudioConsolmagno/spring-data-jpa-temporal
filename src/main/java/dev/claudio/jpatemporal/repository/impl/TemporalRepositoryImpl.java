@@ -147,8 +147,8 @@ public class TemporalRepositoryImpl<T, ID> extends SimpleJpaRepository<T, ID> im
 
     @NonNull
     @Override
-    public void deleteById(@NonNull  ID id) {
-        if(this.deleteById(id, Instant.now()) <= 0) {
+    public void deleteById(@NonNull final ID id) {
+        if (this.deleteById(id, Instant.now()) <= 0) {
             throw new EmptyResultDataAccessException(String.format("No %s entity with id %s exists!", entityInformation.getJavaType(), id), 1);
         }
     }
@@ -189,7 +189,7 @@ public class TemporalRepositoryImpl<T, ID> extends SimpleJpaRepository<T, ID> im
 
     @Override
     @NonNull
-    protected <S extends T> TypedQuery<S> getQuery(Specification<S> spec, @NonNull final Class<S> domainClass, @NonNull final Sort sort) {
+    protected <S extends T> TypedQuery<S> getQuery(final Specification<S> spec, @NonNull final Class<S> domainClass, @NonNull final Sort sort) {
         final Specification<S> toDateSpec = (root, query, criteriaBuilder) -> toAndFromPredicate(MAX_INSTANT, root, criteriaBuilder);
         return super.getQuery(toDateSpec.and(spec), domainClass, sort);
     }
@@ -230,7 +230,9 @@ public class TemporalRepositoryImpl<T, ID> extends SimpleJpaRepository<T, ID> im
     @NonNull
     public Optional<Revision<Integer, T>> findRevision(@NonNull final ID id, @NonNull final Integer revisionNumber) {
         val revisions = findRevisionsList(id);
-        return Optional.ofNullable((revisionNumber > 0 && revisions.size() >= revisionNumber) ? revisions.get(revisionNumber-1) : null);
+        return Optional.ofNullable(revisionNumber > 0 && revisions.size() >= revisionNumber
+                ? revisions.get(revisionNumber - 1)
+                : null);
     }
 
     /******************************************************************************************************************

@@ -25,7 +25,12 @@ import java.time.Instant;
 @Setter
 @ToString
 @MappedSuperclass
+@SuppressWarnings("checkstyle:MemberName")
 public abstract class Temporal {
+
+    protected Temporal() {
+        // This constructor is intentionally empty. Nothing special is needed here.
+    }
 
     @Id
     @TemporalId

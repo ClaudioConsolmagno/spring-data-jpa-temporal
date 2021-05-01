@@ -16,7 +16,7 @@ final class ReflectionUtils {
     public static String fetchAnnotatedField(final Class<?> domainClass, final Class<? extends Annotation> annotation) {
         final List<Field> annotatedFields = fetchAnnotatedFields(domainClass, annotation);
         final List<Method> annotatedMethods = fetchAnnotatedMethods(domainClass, annotation);
-        if ((annotatedFields.size() + annotatedMethods.size()) != 1) {
+        if (annotatedFields.size() + annotatedMethods.size() != 1) {
             if (domainClass.getSuperclass() != null) {
                 return fetchAnnotatedField(domainClass.getSuperclass(), annotation);
             }
