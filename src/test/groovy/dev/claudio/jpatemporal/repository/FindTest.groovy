@@ -1,6 +1,6 @@
 package dev.claudio.jpatemporal.repository
 
-import static dev.claudio.jpatemporal.repository.TemporalRepository.MAX_INSTANT
+
 import static java.time.Instant.now
 
 import dev.claudio.jpatemporal.BaseTestSpecification

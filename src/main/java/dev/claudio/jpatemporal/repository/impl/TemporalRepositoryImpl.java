@@ -44,6 +44,13 @@ import java.util.stream.StreamSupport;
 @NoRepositoryBean
 public class TemporalRepositoryImpl<T, ID> extends SimpleJpaRepository<T, ID> implements TemporalRepository<T, ID> {
 
+    /**
+     * The date 9999-01-01T00:00:00.000Z which is far into the future representing "infinity" time. This is used by
+     * {@link dev.claudio.jpatemporal.annotation.ToDate} to denote that an entity is current and has not been deleted.
+     * The year `9999` seems to be the maximum some sql database implementations accept so it's used as default.
+     */
+    private static final Instant MAX_INSTANT_DEFAULT = Instant.parse("9999-01-01T00:00:00.000Z");
+
     private final JpaEntityInformation<T, ID> entityInformation;
     private final EntityManager em;
     private final AnnotatedEntitySupport annotatedEntitySupport;
@@ -115,7 +122,7 @@ public class TemporalRepositoryImpl<T, ID> extends SimpleJpaRepository<T, ID> im
     @NonNull
     @Override
     public List<T> findAllById(@NonNull final Iterable<ID> ids) {
-        return findAllById(ids, MAX_INSTANT);
+        return findAllById(ids, MAX_INSTANT_DEFAULT);
     }
 
     @NonNull
@@ -142,7 +149,7 @@ public class TemporalRepositoryImpl<T, ID> extends SimpleJpaRepository<T, ID> im
         val currentTime = Instant.now();
         deleteById(id, currentTime);
         entityAccessSupport.setAttribute(annotatedEntitySupport.getFromDate(), entity, currentTime);
-        entityAccessSupport.setAttribute(annotatedEntitySupport.getToDate(), entity, MAX_INSTANT);
+        entityAccessSupport.setAttribute(annotatedEntitySupport.getToDate(), entity, MAX_INSTANT_DEFAULT);
         entityAccessSupport.setAttribute(annotatedEntitySupport.getTemporalId(), entity, null);
         return super.save(entity);
     }
@@ -192,14 +199,14 @@ public class TemporalRepositoryImpl<T, ID> extends SimpleJpaRepository<T, ID> im
     @Override
     @NonNull
     protected <S extends T> TypedQuery<S> getQuery(final Specification<S> spec, @NonNull final Class<S> domainClass, @NonNull final Sort sort) {
-        final Specification<S> toDateSpec = (root, query, criteriaBuilder) -> toAndFromPredicate(MAX_INSTANT, root, criteriaBuilder);
+        final Specification<S> toDateSpec = (root, query, criteriaBuilder) -> toAndFromPredicate(MAX_INSTANT_DEFAULT, root, criteriaBuilder);
         return super.getQuery(toDateSpec.and(spec), domainClass, sort);
     }
 
     @Override
     @NonNull
     protected <S extends T> TypedQuery<Long> getCountQuery(final Specification<S> spec, @NonNull final Class<S> domainClass) {
-        final Specification<S> toDateSpec = (root, query, criteriaBuilder) -> toAndFromPredicate(MAX_INSTANT, root, criteriaBuilder);
+        final Specification<S> toDateSpec = (root, query, criteriaBuilder) -> toAndFromPredicate(MAX_INSTANT_DEFAULT, root, criteriaBuilder);
         return super.getCountQuery(toDateSpec.and(spec), domainClass);
     }
 
@@ -265,8 +272,8 @@ public class TemporalRepositoryImpl<T, ID> extends SimpleJpaRepository<T, ID> im
         if (asOfInstant == null) {
             return criteriaBuilder.conjunction();
         }
-        if (asOfInstant.equals(MAX_INSTANT)) {
-            return criteriaBuilder.equal(root.get(annotatedEntitySupport.getToDate()), MAX_INSTANT);
+        if (asOfInstant.equals(MAX_INSTANT_DEFAULT)) {
+            return criteriaBuilder.equal(root.get(annotatedEntitySupport.getToDate()), MAX_INSTANT_DEFAULT);
         }
         return criteriaBuilder.and(
                 criteriaBuilder.lessThanOrEqualTo(root.get(annotatedEntitySupport.getFromDate()), asOfInstant),
@@ -298,7 +305,7 @@ public class TemporalRepositoryImpl<T, ID> extends SimpleJpaRepository<T, ID> im
         val root = criteriaUpdate.from(this.getDomainClass());
 
         val predicates = new ArrayList<Predicate>();
-        predicates.add(toAndFromPredicate(MAX_INSTANT, root, criteriaBuilder));
+        predicates.add(toAndFromPredicate(MAX_INSTANT_DEFAULT, root, criteriaBuilder));
         if (ids != null) predicates.add(inIdPredicate(ids, root, criteriaBuilder));
 
         criteriaUpdate.set(root.get(annotatedEntitySupport.getToDate()), currentTime)

@@ -1,6 +1,5 @@
 package dev.claudio.jpatemporal.repository
 
-import static dev.claudio.jpatemporal.repository.TemporalRepository.MAX_INSTANT
 
 import dev.claudio.jpatemporal.BaseTestSpecification
 import dev.claudio.jpatemporal.domain.Employee

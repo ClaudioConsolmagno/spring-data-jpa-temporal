@@ -5,7 +5,7 @@ plugins {
 	id 'signing'
 	id 'maven-publish'
 	id 'io.freefair.lombok' version '6.0.0-m2'
-	id 'com.github.spotbugs' version '4.7.0' // https://spotbugs.readthedocs.io/en/stable/gradle.html
+	id 'com.github.spotbugs' version '4.7.1' // https://spotbugs.readthedocs.io/en/stable/gradle.html
 	id 'pmd' // https://docs.gradle.org/current/userguide/pmd_plugin.html
 	id 'checkstyle' // https://checkstyle.sourceforge.io/
 }

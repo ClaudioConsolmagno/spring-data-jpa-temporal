@@ -28,12 +28,6 @@ import java.util.Optional;
 public interface TemporalRepository<T, ID> extends JpaRepository<T, ID>, JpaSpecificationExecutor<T>, RevisionRepository<T, ID, Integer> {
 
     /**
-     * The date 99999999-01-01T00:00:00.000Z which is far into the future representing "infinity" time. This is used by
-     * {@link dev.claudio.jpatemporal.annotation.ToDate} to denote that an entity is current and has not been deleted.
-     */
-    Instant MAX_INSTANT = Instant.ofEpochSecond(3155633001244800L);
-
-    /**
      * Retrieves an entity by its {@code ids} at the given {@code asOfInstant}.
      *
      * @param id must not be {@literal null}.

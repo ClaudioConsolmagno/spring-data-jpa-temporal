@@ -1,6 +1,5 @@
-[![Maven Central](https://img.shields.io/maven-central/v/dev.claudio/spring-data-jpa-temporal.svg?label=Maven%20Central&color=success)](https://search.maven.org/search?q=g:%22dev.claudio%22%20AND%20a:%22spring-data-jpa-temporal%22)
+# Spring Data JPA Temporal Audit <div style="float:right"> [![Maven Central](https://img.shields.io/maven-central/v/dev.claudio/spring-data-jpa-temporal.svg?label=Maven%20Central&color=success)](https://search.maven.org/search?q=g:%22dev.claudio%22%20AND%20a:%22spring-data-jpa-temporal%22) </div>
 
-# Spring Data JPA Temporal Audit
 
 Spring Data JPA Temporal Audit is an extension of [spring-data-jpa](https://github.com/spring-projects/spring-data-jpa) that makes it simple to keep an audit of your data in the same table as your main data itself.
 

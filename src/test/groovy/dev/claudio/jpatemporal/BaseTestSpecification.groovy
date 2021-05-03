@@ -1,7 +1,5 @@
 package dev.claudio.jpatemporal
 
-import static dev.claudio.jpatemporal.repository.TemporalRepository.MAX_INSTANT
-
 import dev.claudio.jpatemporal.domain.Employee
 import dev.claudio.jpatemporal.repository.Repository
 import org.springframework.beans.factory.annotation.Autowired
@@ -16,6 +14,8 @@ class BaseTestSpecification extends Specification {
 
     @Autowired Repository repository
     @Autowired RepositoryJpa repositoryJpa
+
+    static final MAX_INSTANT = year(9999)
 
     def setup() {
         assert repositoryJpa.count() == 0
