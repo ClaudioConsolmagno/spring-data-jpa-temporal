@@ -16,8 +16,9 @@ final class ReflectionUtils {
     public static String fetchAnnotatedField(final Class<?> domainClass, final Class<? extends Annotation> annotation) {
         final List<Field> annotatedFields = fetchAnnotatedFields(domainClass, annotation);
         final List<Method> annotatedMethods = fetchAnnotatedMethods(domainClass, annotation);
-        if (annotatedFields.size() + annotatedMethods.size() != 1) {
-            if (domainClass.getSuperclass() != null) {
+        final int annotationCount = annotatedFields.size() + annotatedMethods.size();
+        if (annotationCount != 1) {
+            if (annotationCount == 0 && domainClass.getSuperclass() != null) {
                 return fetchAnnotatedField(domainClass.getSuperclass(), annotation);
             }
             throw new RuntimeException("Should have a single annotation '" + annotation.getSimpleName() + "' on " + domainClass + " or its child");

@@ -1,4 +1,4 @@
-[![Maven Central](https://img.shields.io/maven-central/v/dev.claudio/spring-data-jpa-temporal.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22dev.claudio%22%20AND%20a:%22spring-data-jpa-temporal%22)
+[![Maven Central](https://img.shields.io/maven-central/v/dev.claudio/spring-data-jpa-temporal.svg?label=Maven%20Central&color=success)](https://search.maven.org/search?q=g:%22dev.claudio%22%20AND%20a:%22spring-data-jpa-temporal%22)
 
 # Spring Data JPA Temporal Audit
 
@@ -92,8 +92,10 @@ The following 2 functionalities aren't currently supported with this library. An
   - [ ] Annotated fields and methods (i.e. entity doesn't extend `Temporal.java`)
   - [ ] Fields without getters and setters
   - [ ] Test @Query annotation on repository methods.
-  - [ ] Test on AnnotatedAttributes.java
+  - [ ] Tests for AnnotatedEntitySupport.java
+  - [ ] Tests for EntityAccessSupport.java
 - [ ] Java 9 modules?
+- [ ] Add debug logging
 - [ ] Work on limitations (section above)
   - Maybe listeners can help solve relations limitation (e.g. see EnversPreUpdateEventListenerImpl)
 - [ ] Implement `findRevisions(ID, Pageable)`

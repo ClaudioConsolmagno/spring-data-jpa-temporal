@@ -44,15 +44,17 @@ import java.util.stream.StreamSupport;
 @NoRepositoryBean
 public class TemporalRepositoryImpl<T, ID> extends SimpleJpaRepository<T, ID> implements TemporalRepository<T, ID> {
 
-    private final AnnotatedEntitySupport<T> annotatedEntitySupport;
     private final JpaEntityInformation<T, ID> entityInformation;
     private final EntityManager em;
+    private final AnnotatedEntitySupport annotatedEntitySupport;
+    private final EntityAccessSupport<T> entityAccessSupport;
 
     public TemporalRepositoryImpl(final JpaEntityInformation<T, ID> entityInformation, final EntityManager em) {
         super(entityInformation, em);
         this.entityInformation = entityInformation;
         this.em = em;
-        this.annotatedEntitySupport = new AnnotatedEntitySupport<>(this.getDomainClass());
+        this.annotatedEntitySupport = new AnnotatedEntitySupport(this.getDomainClass());
+        this.entityAccessSupport = new EntityAccessSupport<>(this.getDomainClass(), this.annotatedEntitySupport.getAllAttributes());
     }
 
     /******************************************************************************************************************
@@ -139,9 +141,9 @@ public class TemporalRepositoryImpl<T, ID> extends SimpleJpaRepository<T, ID> im
         }
         val currentTime = Instant.now();
         deleteById(id, currentTime);
-        annotatedEntitySupport.setAttribute(annotatedEntitySupport.getFromDate(), entity, currentTime);
-        annotatedEntitySupport.setAttribute(annotatedEntitySupport.getToDate(), entity, MAX_INSTANT);
-        annotatedEntitySupport.setAttribute(annotatedEntitySupport.getTemporalId(), entity, null);
+        entityAccessSupport.setAttribute(annotatedEntitySupport.getFromDate(), entity, currentTime);
+        entityAccessSupport.setAttribute(annotatedEntitySupport.getToDate(), entity, MAX_INSTANT);
+        entityAccessSupport.setAttribute(annotatedEntitySupport.getTemporalId(), entity, null);
         return super.save(entity);
     }
 
@@ -280,7 +282,7 @@ public class TemporalRepositoryImpl<T, ID> extends SimpleJpaRepository<T, ID> im
 
     @SuppressWarnings("unchecked")
     protected ID getIdFromEntity(final T entity) {
-        return (ID) annotatedEntitySupport.getAttribute(annotatedEntitySupport.getUniqueKey(), entity);
+        return (ID) entityAccessSupport.getAttribute(annotatedEntitySupport.getUniqueKey(), entity);
     }
 
     protected int deleteById(final ID id, final Instant currentTime) {
@@ -309,7 +311,7 @@ public class TemporalRepositoryImpl<T, ID> extends SimpleJpaRepository<T, ID> im
         List<Revision<Integer, T>> metadataList = new ArrayList<>();
         for (int i = 0; i < allByIdAsOf.size(); i++) {
             T entity = allByIdAsOf.get(i);
-            Instant timestamp = (Instant) annotatedEntitySupport.getAttribute(annotatedEntitySupport.getFromDate(), entity);
+            Instant timestamp = (Instant) entityAccessSupport.getAttribute(annotatedEntitySupport.getFromDate(), entity);
             RevisionMetadataImpl<T, Integer> metadata = new RevisionMetadataImpl<>(entity, i + 1, timestamp);
             metadataList.add(Revision.of(metadata, entity));
         }
