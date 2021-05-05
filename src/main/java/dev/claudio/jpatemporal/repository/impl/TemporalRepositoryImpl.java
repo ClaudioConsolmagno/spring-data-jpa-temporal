@@ -23,6 +23,7 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -44,12 +45,8 @@ import java.util.stream.StreamSupport;
 @NoRepositoryBean
 public class TemporalRepositoryImpl<T, ID> extends SimpleJpaRepository<T, ID> implements TemporalRepository<T, ID> {
 
-    /**
-     * The date 9999-01-01T00:00:00.000Z which is far into the future representing "infinity" time. This is used by
-     * {@link dev.claudio.jpatemporal.annotation.ToDate} to denote that an entity is current and has not been deleted.
-     * The year `9999` seems to be the maximum some sql database implementations accept so it's used as default.
-     */
-    private static final Instant MAX_INSTANT_DEFAULT = Instant.parse("9999-01-01T00:00:00.000Z");
+    public static final ChronoUnit TIMESTAMP_PRECISION_DEFAULT = ChronoUnit.MICROS;
+    public static final Instant MAX_INSTANT_DEFAULT = truncate(Instant.parse("9999-01-01T00:00:00.000000000Z"));
 
     private final JpaEntityInformation<T, ID> entityInformation;
     private final EntityManager em;
@@ -146,7 +143,7 @@ public class TemporalRepositoryImpl<T, ID> extends SimpleJpaRepository<T, ID> im
         if (existingEntity.isPresent() && existingEntity.get().equals(entity)) {
             return entity;
         }
-        val currentTime = Instant.now();
+        val currentTime = now();
         deleteById(id, currentTime);
         entityAccessSupport.setAttribute(annotatedEntitySupport.getFromDate(), entity, currentTime);
         entityAccessSupport.setAttribute(annotatedEntitySupport.getToDate(), entity, MAX_INSTANT_DEFAULT);
@@ -154,10 +151,9 @@ public class TemporalRepositoryImpl<T, ID> extends SimpleJpaRepository<T, ID> im
         return super.save(entity);
     }
 
-    @NonNull
     @Override
     public void deleteById(@NonNull final ID id) {
-        if (this.deleteById(id, Instant.now()) <= 0) {
+        if (this.deleteById(id, now()) <= 0) {
             throw new EmptyResultDataAccessException(String.format("No %s entity with id %s exists!", entityInformation.getJavaType(), id), 1);
         }
     }
@@ -165,12 +161,12 @@ public class TemporalRepositoryImpl<T, ID> extends SimpleJpaRepository<T, ID> im
     @Override
     public void delete(@NonNull final T entity) {
         final ID id = this.getIdFromEntity(entity);
-        this.deleteById(id, Instant.now());
+        this.deleteById(id, now());
     }
 
     @Override
     public void deleteAllInBatch() {
-        this.deleteByIds(null, Instant.now());
+        this.deleteByIds(null, now());
     }
 
     @Override
@@ -179,7 +175,7 @@ public class TemporalRepositoryImpl<T, ID> extends SimpleJpaRepository<T, ID> im
                 .map(this::getIdFromEntity)
                 .collect(Collectors.toSet());
         if (idsToDelete.isEmpty()) return;
-        this.deleteByIds(idsToDelete, Instant.now());
+        this.deleteByIds(idsToDelete, now());
     }
 
     @Override
@@ -187,7 +183,7 @@ public class TemporalRepositoryImpl<T, ID> extends SimpleJpaRepository<T, ID> im
         Set<ID> idsToDelete = StreamSupport.stream(ids.spliterator(), false)
                 .collect(Collectors.toSet());
         if (idsToDelete.isEmpty()) return;
-        this.deleteByIds(idsToDelete, Instant.now());
+        this.deleteByIds(idsToDelete, now());
     }
 
     @Override
@@ -323,5 +319,13 @@ public class TemporalRepositoryImpl<T, ID> extends SimpleJpaRepository<T, ID> im
             metadataList.add(Revision.of(metadata, entity));
         }
         return metadataList;
+    }
+
+    private static Instant now() {
+        return Instant.now().truncatedTo(ChronoUnit.MICROS);
+    }
+
+    private static Instant truncate(final Instant instant) {
+        return instant.truncatedTo(TIMESTAMP_PRECISION_DEFAULT);
     }
 }
