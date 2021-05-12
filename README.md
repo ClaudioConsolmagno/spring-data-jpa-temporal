@@ -18,7 +18,20 @@ More specifically, your table becomes a "system-version table". The following ex
 
 # Who is this for?
 
-- You want a simple and lightweight auditing mechanism for your tables, i.e. no other tables are created, no triggers, minimal springboot configuration.
+- You want a simple and lightweight auditing mechanism for your tables, i.e.:
+  - No other tables are created
+  - No triggers
+  - Adding a new column automatically starts versioning it
+  - Minimal springboot configuration
+- You want a no fuss way of looking at audit:
+  - You can very easily use regular `findBy` methods to find data at a point in time
+  - You can use Spring's `RevisionRepository` interface to find all revisions associated to a record
+  - At a database level, everything is in the same table as your main data itself, so it's very easy to analyse, report and build upon that data. For example:
+    ```sql
+        select * from employee where id = 1 and to_date > now() -- finds employee with id == 1 as of right now (current data)
+        select * from employee where id = 1 and to_date > '2021-04-01T00:00:00.000Z' and from_date <= '2021-04-01T00:00:00.000Z'-- finds employee with id == 1 as of 2021-04-01T00:00:00.000Z
+        select * from employee where id = 1 order by from_date -- find all revisions of employee with id == 1
+    ```
 - You have a relatively simple model and can live with the limitations of this library described in the [Limitations](#Limitations) section below.
 
 # Usage
