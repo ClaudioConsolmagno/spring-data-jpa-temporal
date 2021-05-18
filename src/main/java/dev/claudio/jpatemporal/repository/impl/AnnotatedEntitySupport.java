@@ -31,10 +31,10 @@ class AnnotatedEntitySupport {
 
     AnnotatedEntitySupport(final Class<?> domainClass) {
         validateNoRelationalAnnotations(domainClass);
-        this.uniqueKey = ReflectionUtils.fetchAnnotatedField(domainClass, UniqueKey.class);
-        this.temporalId = ReflectionUtils.fetchAnnotatedField(domainClass, TemporalId.class);
-        this.fromDate = ReflectionUtils.fetchAnnotatedField(domainClass, FromDate.class);
-        this.toDate = ReflectionUtils.fetchAnnotatedField(domainClass, ToDate.class);
+        this.uniqueKey = ReflectionUtils.fetchAnnotatedColumnName(domainClass, UniqueKey.class);
+        this.temporalId = ReflectionUtils.fetchAnnotatedColumnName(domainClass, TemporalId.class);
+        this.fromDate = ReflectionUtils.fetchAnnotatedColumnName(domainClass, FromDate.class);
+        this.toDate = ReflectionUtils.fetchAnnotatedColumnName(domainClass, ToDate.class);
     }
 
     public Set<String> getAllAttributes() {
