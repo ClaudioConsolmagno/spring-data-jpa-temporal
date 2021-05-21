@@ -32,11 +32,15 @@ class EntityAccessSupport<T> {
     }
 
     public Object getAttribute(final String attribute, final T entity) {
-        return getters.get(attribute).apply(entity);
+        return getters.getOrDefault(attribute, (t) -> {
+            throw new RuntimeException(attribute + " not declared for entity " + entity.getClass().getSimpleName());
+        }).apply(entity);
     }
 
     public void setAttribute(final String attribute, final T entity, final Object value) {
-        setters.get(attribute).accept(entity, value);
+        setters.getOrDefault(attribute, (t, o) -> {
+            throw new RuntimeException(attribute + " not declared for entity " + entity.getClass().getSimpleName());
+        }).accept(entity, value);
     }
 
     private ThrowingFunction<T, Object> createGetterFunction(final String name, final PropertyDescriptor it, final Class<T> domainClass) throws IllegalAccessException {

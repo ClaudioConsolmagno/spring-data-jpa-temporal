@@ -22,9 +22,11 @@ final class ReflectionUtils {
      *   <li> {@code annotation} on a getter method: the method name in lower case without the initial {@code get} part
      *     is returned. </li>
      * </ul>
-     * @return The column name that should be used by the annotated field or method in the {@code domainClass}
+     * @return The column name that should be used by the annotated field or method in the {@code domainClass}.
+     * {@link Optional#empty()} is returned when annotation isn't found on the class hierarchy or it's found multiple
+     * time on the same level.
      */
-    public static String fetchAnnotatedColumnName(final Class<?> domainClass, final Class<? extends Annotation> annotation) {
+    public static Optional<String> fetchAnnotatedColumnName(final Class<?> domainClass, final Class<? extends Annotation> annotation) {
         final List<Field> annotatedFields = fetchAnnotatedFields(domainClass, annotation);
         final List<Method> annotatedMethods = fetchAnnotatedMethods(domainClass, annotation);
         final int annotationCount = annotatedFields.size() + annotatedMethods.size();
@@ -32,22 +34,26 @@ final class ReflectionUtils {
             if (annotationCount == 0 && domainClass.getSuperclass() != null) {
                 return fetchAnnotatedColumnName(domainClass.getSuperclass(), annotation);
             }
-            throw new RuntimeException("Should have a single annotation '" + annotation.getSimpleName() + "' on " + domainClass + " or its child");
+            return Optional.empty();
         }
-        String fieldName;
+        String fieldOrMethodName;
         Optional<Column> columnAnnotation;
         if (annotatedFields.isEmpty()) {
-            fieldName = annotatedMethods.get(0).getName();
-            fieldName = fieldName.startsWith("get") ? fieldName.replaceFirst("get", "").toLowerCase(Locale.ROOT) : fieldName;
+            fieldOrMethodName = annotatedMethods.get(0).getName();
+            fieldOrMethodName = fieldOrMethodName.startsWith("get") ? fieldOrMethodName.replaceFirst("get", "").toLowerCase(Locale.ROOT) : fieldOrMethodName;
             columnAnnotation = Optional.ofNullable(annotatedMethods.get(0).getAnnotation(Column.class));
         } else {
-            fieldName = annotatedFields.get(0).getName();
+            fieldOrMethodName = annotatedFields.get(0).getName();
             columnAnnotation = Optional.ofNullable(annotatedFields.get(0).getAnnotation(Column.class));
         }
-        return columnAnnotation
+        Optional<String> name = columnAnnotation
                 .map(Column::name)
-                .filter(it -> !it.isEmpty())
-                .orElse(fieldName);
+                .filter(it -> !it.isEmpty());
+        if (name.isPresent()) {
+            return name;
+        } else {
+            return Optional.of(fieldOrMethodName);
+        }
     }
 
     /**

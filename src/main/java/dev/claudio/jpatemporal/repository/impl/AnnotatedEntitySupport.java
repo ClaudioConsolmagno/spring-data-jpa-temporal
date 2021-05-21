@@ -31,10 +31,10 @@ class AnnotatedEntitySupport {
 
     AnnotatedEntitySupport(final Class<?> domainClass) {
         validateNoRelationalAnnotations(domainClass);
-        this.uniqueKey = ReflectionUtils.fetchAnnotatedColumnName(domainClass, UniqueKey.class);
-        this.temporalId = ReflectionUtils.fetchAnnotatedColumnName(domainClass, TemporalId.class);
-        this.fromDate = ReflectionUtils.fetchAnnotatedColumnName(domainClass, FromDate.class);
-        this.toDate = ReflectionUtils.fetchAnnotatedColumnName(domainClass, ToDate.class);
+        this.uniqueKey = fetchColumnNameOrThrow(domainClass, UniqueKey.class);
+        this.temporalId = fetchColumnNameOrThrow(domainClass, TemporalId.class);
+        this.fromDate = fetchColumnNameOrThrow(domainClass, FromDate.class);
+        this.toDate = fetchColumnNameOrThrow(domainClass, ToDate.class);
     }
 
     public Set<String> getAllAttributes() {
@@ -52,5 +52,12 @@ class AnnotatedEntitySupport {
         if (hasRelationalAnnotations) {
             throw new RuntimeException("Relational Annotations are not supported: " + RELATIONAL_ANNOTATIONS);
         }
+    }
+
+    private String fetchColumnNameOrThrow(final Class<?> domainClass, final Class<? extends Annotation> annotation) {
+        return ReflectionUtils.fetchAnnotatedColumnName(domainClass, annotation)
+                .orElseThrow(() ->
+                        new RuntimeException("Should have a single annotation '" + annotation.getSimpleName() + "' on " + domainClass + " or its child")
+                );
     }
 }

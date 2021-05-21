@@ -1,5 +1,8 @@
 package dev.claudio.jpatemporal.repository.impl
 
+import static java.lang.annotation.ElementType.FIELD
+import static java.lang.annotation.ElementType.METHOD
+
 import dev.claudio.jpatemporal.annotation.FromDate
 import dev.claudio.jpatemporal.annotation.TemporalId
 import dev.claudio.jpatemporal.annotation.ToDate
@@ -7,33 +10,25 @@ import dev.claudio.jpatemporal.annotation.UniqueKey
 import spock.lang.Specification
 
 import javax.persistence.Column
+import java.lang.annotation.Retention
+import java.lang.annotation.RetentionPolicy
+import java.lang.annotation.Target
 import java.lang.reflect.Field
 
 class ReflectionUtilsTest extends Specification {
 
-    def "fetchAnnotatedColumnName() - couldn't find annotated field or method"() {
-        when:
-            ReflectionUtils.fetchAnnotatedColumnName(TargetClass1, TemporalId)
-        then:
-            thrown(RuntimeException)
-    }
-
-    def "fetchAnnotatedColumnName() - multiple fields/methods with same annotation"() {
-        when:
-            ReflectionUtils.fetchAnnotatedColumnName(TargetClass1, UniqueKey)
-        then:
-            thrown(RuntimeException)
-    }
-
     def "fetchAnnotatedColumnName()"() {
         expect:
-            ReflectionUtils.fetchAnnotatedColumnName(TargetClass1, FromDate) == 'fieldC1'
-            ReflectionUtils.fetchAnnotatedColumnName(TargetClass2, FromDate) == 'fieldC2'
-            ReflectionUtils.fetchAnnotatedColumnName(TargetClass1, ToDate) == 'fieldD2'
-            ReflectionUtils.fetchAnnotatedColumnName(TargetClass2, ToDate) == 'fieldD2'
+            ReflectionUtils.fetchAnnotatedColumnName(TargetClass1, TemporalId).isEmpty()
+            ReflectionUtils.fetchAnnotatedColumnName(TargetClass1, UniqueKey).isEmpty()
         and:
-            ReflectionUtils.fetchAnnotatedColumnName(TargetClass1, ExtraAnnotation) == 'custom_column_name_field_b1'
-            ReflectionUtils.fetchAnnotatedColumnName(TargetClass2, ExtraAnnotation) == 'an_annotated_getter'
+            ReflectionUtils.fetchAnnotatedColumnName(TargetClass1, FromDate).get() == 'fieldC1'
+            ReflectionUtils.fetchAnnotatedColumnName(TargetClass2, FromDate).get() == 'fieldC2'
+            ReflectionUtils.fetchAnnotatedColumnName(TargetClass1, ToDate).get() == 'fieldD2'
+            ReflectionUtils.fetchAnnotatedColumnName(TargetClass2, ToDate).get() == 'fieldD2'
+        and:
+            ReflectionUtils.fetchAnnotatedColumnName(TargetClass1, ExtraAnnotation).get() == 'custom_column_name_field_b1'
+            ReflectionUtils.fetchAnnotatedColumnName(TargetClass2, ExtraAnnotation).get() == 'an_annotated_getter'
     }
 
     def "fetchAnnotatedMethods()"() {
@@ -120,4 +115,10 @@ class ReflectionUtilsTest extends Specification {
         @ExtraAnnotation
         def getAn_Annotated_Getter() {}
     }
+}
+
+@Target([METHOD, FIELD])
+@Retention(RetentionPolicy.RUNTIME)
+@interface ExtraAnnotation {
+
 }
