@@ -5,6 +5,7 @@ import dev.claudio.jpatemporal.annotation.TemporalId
 import dev.claudio.jpatemporal.annotation.ToDate
 import dev.claudio.jpatemporal.annotation.UniqueKey
 import dev.claudio.jpatemporal.domain.Temporal
+import dev.claudio.jpatemporal.exception.JpaTemporalException
 import spock.lang.Specification
 import spock.lang.Unroll
 
@@ -19,7 +20,7 @@ class AnnotatedEntitySupportTest extends Specification {
         when:
             new AnnotatedEntitySupport(targetClass);
         then:
-            thrown(RuntimeException)
+            thrown(JpaTemporalException)
         where:
             targetClass << [
                 ClassMissingUniqueKey.class,

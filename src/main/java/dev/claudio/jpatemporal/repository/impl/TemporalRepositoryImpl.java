@@ -1,5 +1,6 @@
 package dev.claudio.jpatemporal.repository.impl;
 
+import dev.claudio.jpatemporal.exception.JpaTemporalException;
 import dev.claudio.jpatemporal.repository.TemporalRepository;
 import lombok.val;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -290,7 +291,7 @@ public class TemporalRepositoryImpl<T, ID> extends SimpleJpaRepository<T, ID> im
 
     protected int deleteById(final ID id, final Instant currentTime) {
         if (id == null) {
-            throw new JpaSystemException(new RuntimeException("ids for this class must be manually assigned before calling save/delete: " + this.getDomainClass().getName()));
+            throw new JpaSystemException(new JpaTemporalException("ids for this class must be manually assigned before calling save/delete: " + this.getDomainClass().getName()));
         }
         return deleteByIds(Collections.singleton(id), currentTime);
     }

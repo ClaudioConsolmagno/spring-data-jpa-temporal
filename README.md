@@ -100,11 +100,8 @@ The following 2 functionalities aren't currently supported with this library. An
 
 # Next Steps
 
-- [ ] Extra unit tests on:
-  - [ ] Annotated fields and methods (i.e. entity doesn't extend `Temporal.java`)
-  - [ ] Fields without getters and setters
 - [ ] Java 9 modules?
-- [ ] Add debug logging
+- [ ] Add debug/trace logging
 - [ ] Work on limitations (section above)
   - Maybe listeners can help solve relations limitation (e.g. see EnversPreUpdateEventListenerImpl)
 - [ ] Implement `findRevisions(ID, Pageable)`

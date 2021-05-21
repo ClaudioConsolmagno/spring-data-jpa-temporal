@@ -4,6 +4,7 @@ import dev.claudio.jpatemporal.annotation.FromDate;
 import dev.claudio.jpatemporal.annotation.TemporalId;
 import dev.claudio.jpatemporal.annotation.ToDate;
 import dev.claudio.jpatemporal.annotation.UniqueKey;
+import dev.claudio.jpatemporal.exception.JpaTemporalException;
 import lombok.Getter;
 import lombok.ToString;
 
@@ -50,14 +51,14 @@ class AnnotatedEntitySupport {
                         + ReflectionUtils.fetchAnnotatedFields(domainClass, annotation).size() > 0
                 );
         if (hasRelationalAnnotations) {
-            throw new RuntimeException("Relational Annotations are not supported: " + RELATIONAL_ANNOTATIONS);
+            throw new JpaTemporalException("Relational Annotations are not supported: " + RELATIONAL_ANNOTATIONS);
         }
     }
 
     private String fetchColumnNameOrThrow(final Class<?> domainClass, final Class<? extends Annotation> annotation) {
         return ReflectionUtils.fetchAnnotatedColumnName(domainClass, annotation)
                 .orElseThrow(() ->
-                        new RuntimeException("Should have a single annotation '" + annotation.getSimpleName() + "' on " + domainClass + " or its child")
+                        new JpaTemporalException("Should have a single annotation '" + annotation.getSimpleName() + "' on " + domainClass + " or its child")
                 );
     }
 }

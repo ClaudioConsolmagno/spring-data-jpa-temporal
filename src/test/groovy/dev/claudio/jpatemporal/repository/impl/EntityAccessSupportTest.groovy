@@ -1,6 +1,6 @@
 package dev.claudio.jpatemporal.repository.impl
 
-
+import dev.claudio.jpatemporal.exception.JpaTemporalException
 import spock.lang.Specification
 
 class EntityAccessSupportTest extends Specification {
@@ -51,11 +51,11 @@ class EntityAccessSupportTest extends Specification {
         when:
             entityAccessSupport.getAttribute('b', targetEntity)
         then:
-            thrown(RuntimeException)
+            thrown(JpaTemporalException)
         when:
             entityAccessSupport.setAttribute('b', targetEntity, 'b2')
         then:
-            thrown(RuntimeException)
+            thrown(JpaTemporalException)
     }
 
     class ClassPublicFields {

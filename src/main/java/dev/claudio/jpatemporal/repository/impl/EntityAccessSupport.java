@@ -1,5 +1,7 @@
 package dev.claudio.jpatemporal.repository.impl;
 
+import dev.claudio.jpatemporal.exception.JpaTemporalException;
+
 import java.beans.FeatureDescriptor;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
@@ -27,19 +29,19 @@ class EntityAccessSupport<T> {
                 setters.put(it, createSetterFunction(it, descriptorMap.get(it), domainClass));
             }
         } catch (IntrospectionException | IllegalAccessException e) {
-            throw new RuntimeException("Could not correctly identify public properties or getters/setters for " + domainClass, e);
+            throw new JpaTemporalException("Could not correctly identify public properties or getters/setters for " + domainClass, e);
         }
     }
 
     public Object getAttribute(final String attribute, final T entity) {
         return getters.getOrDefault(attribute, (t) -> {
-            throw new RuntimeException(attribute + " not declared for entity " + entity.getClass().getSimpleName());
+            throw new JpaTemporalException(attribute + " not declared for entity " + entity.getClass().getSimpleName());
         }).apply(entity);
     }
 
     public void setAttribute(final String attribute, final T entity, final Object value) {
         setters.getOrDefault(attribute, (t, o) -> {
-            throw new RuntimeException(attribute + " not declared for entity " + entity.getClass().getSimpleName());
+            throw new JpaTemporalException(attribute + " not declared for entity " + entity.getClass().getSimpleName());
         }).accept(entity, value);
     }
 
@@ -76,7 +78,7 @@ class EntityAccessSupport<T> {
             try {
                 return applyThrows(elem);
             } catch (final Exception e) {
-                throw new RuntimeException(String.format("Could not apply '%s'", elem), e);
+                throw new JpaTemporalException(String.format("Could not apply '%s'", elem), e);
             }
         }
 
@@ -91,7 +93,7 @@ class EntityAccessSupport<T> {
             try {
                 acceptThrows(elem, elem2);
             } catch (final Exception e) {
-                throw new RuntimeException(String.format("Could not accept '%s' with '%s'", elem, elem2), e);
+                throw new JpaTemporalException(String.format("Could not accept '%s' with '%s'", elem, elem2), e);
             }
         }
 
