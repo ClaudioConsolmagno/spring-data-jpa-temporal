@@ -103,7 +103,6 @@ The following 2 functionalities aren't currently supported with this library. An
 - [ ] Extra unit tests on:
   - [ ] Annotated fields and methods (i.e. entity doesn't extend `Temporal.java`)
   - [ ] Fields without getters and setters
-  - [ ] Test @Query annotation on repository methods.
 - [ ] Java 9 modules?
 - [ ] Add debug logging
 - [ ] Work on limitations (section above)
