@@ -1,5 +1,6 @@
-# Spring Data JPA Temporal Audit <div style="float:right"> [![Maven Central](https://img.shields.io/maven-central/v/dev.claudio/spring-data-jpa-temporal.svg?label=Maven%20Central&color=success)](https://search.maven.org/search?q=g:%22dev.claudio%22%20AND%20a:%22spring-data-jpa-temporal%22) [![javadoc](https://javadoc.io/badge2/dev.claudio/spring-data-jpa-temporal/javadoc.svg)](https://javadoc.io/doc/dev.claudio/spring-data-jpa-temporal) </div>
-
+# Spring Data JPA Temporal Audit
+[![Maven Central](https://img.shields.io/maven-central/v/dev.claudio/spring-data-jpa-temporal.svg?label=Maven%20Central&color=success)](https://search.maven.org/search?q=g:%22dev.claudio%22%20AND%20a:%22spring-data-jpa-temporal%22)
+[![javadoc](https://javadoc.io/badge2/dev.claudio/spring-data-jpa-temporal/javadoc.svg)](https://javadoc.io/doc/dev.claudio/spring-data-jpa-temporal)
 
 Spring Data JPA Temporal Audit is an extension of [spring-data-jpa](https://github.com/spring-projects/spring-data-jpa) that makes it simple to keep an audit of your data in the same table as your main data itself.
 
@@ -95,7 +96,7 @@ I'm not aware of any other "temporal" JPA implementations although there are ple
 
 The following 2 functionalities aren't currently supported with this library. An exception may be thrown at spring boot start-up if you try to use them. I'll try and work on those in the future. 
 
-- Does not support [derived query methods](https://www.baeldung.com/spring-data-derived-queries), e.g. `findByNameAndAddress`, `countByNameAndAddress`, etc. However, you could create methods and use @Query annotation to specify a query to run.
+- Does not support [derived query methods](https://www.baeldung.com/spring-data-derived-queries), e.g. `findByNameAndAddress`, `countByNameAndAddress`, etc. However, you could create methods and use `@Query` annotation to specify a query to run (e.g. [Repository.java](src/test/java/dev/claudio/jpatemporal/repository/Repository.java)).
 - Does not support relations, e.g. `@OneToOne`, `@OneToMany`, etc.
 
 # Next Steps
