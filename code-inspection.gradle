@@ -1,6 +1,4 @@
-
 ///////////////////////// Spotbugs /////////////////////////
-
 spotbugs {
 	effort = 'max'
 	reportLevel = "low"
@@ -8,26 +6,24 @@ spotbugs {
 }
 spotbugsMain {
 	reports {
-		xml.enabled = false
-		html.enabled = true
+		xml.required = false
+		html.required = true
 	}
 }
 spotbugsTest.enabled = false
 
 ///////////////////////// PMD /////////////////////////
-
 pmdMain {
 	ruleSetFiles = files('/src/test/resources/pmd.xml')
 	ruleSets = []
 	reports {
-		xml.enabled = false
-		html.enabled = true
+		xml.required = false
+		html.required = true
 	}
 }
 pmdTest.enabled = false
 
 ///////////////////////// Checkstyle /////////////////////////
-
 checkstyle {
 	// from: https://github.com/checkstyle/checkstyle/blob/master/src/main/resources/sun_checks.xml
 	configFile file("${project.rootDir}/src/test/resources/checkstyle.xml") // Checkstyle config location
@@ -36,8 +32,8 @@ checkstyle {
 checkstyleMain {
 	source '/src/main/java'
 	reports {
-		xml.enabled = false
-		html.enabled = true
+		xml.required = false
+		html.required = true
 	}
 }
 checkstyleTest.enabled = false

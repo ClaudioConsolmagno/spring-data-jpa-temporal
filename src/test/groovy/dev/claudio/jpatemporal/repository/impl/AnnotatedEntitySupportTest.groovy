@@ -7,7 +7,6 @@ import dev.claudio.jpatemporal.annotation.UniqueKey
 import dev.claudio.jpatemporal.domain.Temporal
 import dev.claudio.jpatemporal.exception.JpaTemporalException
 import spock.lang.Specification
-import spock.lang.Unroll
 
 import javax.persistence.ManyToMany
 import javax.persistence.ManyToOne

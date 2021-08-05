@@ -4,14 +4,14 @@ plugins {
 	id 'java-library'
 	id 'signing'
 	id 'maven-publish'
-	id 'io.freefair.lombok' version '6.0.0-m2'
-	id 'com.github.spotbugs' version '4.7.1' // https://spotbugs.readthedocs.io/en/stable/gradle.html
+	id 'io.freefair.lombok' version '6.1.0-m3'
+	id 'com.github.spotbugs' version '4.7.2' // https://spotbugs.readthedocs.io/en/stable/gradle.html
 	id 'pmd' // https://docs.gradle.org/current/userguide/pmd_plugin.html
 	id 'checkstyle' // https://checkstyle.sourceforge.io/
 }
 
 group = 'dev.claudio'
-version = '0.1.4-SNAPSHOT'
+version = '0.1.4'
 
 apply from: 'maven-publishing.gradle'
 apply from: 'code-inspection.gradle'
@@ -29,15 +29,19 @@ repositories {
 	mavenCentral()
 }
 
+ext {
+	spring_data_jpa_version = '2.5.3'
+}
+
 dependencies {
-	implementation 'org.springframework.data:spring-data-jpa:2.5.1'
+	implementation "org.springframework.data:spring-data-jpa:$spring_data_jpa_version"
 	implementation 'jakarta.persistence:jakarta.persistence-api:2.2.3'
 
 	testImplementation 'org.codehaus.groovy:groovy-all:3.0.8'
 	testImplementation 'org.spockframework:spock-spring:2.0-groovy-3.0'
 	testImplementation 'org.spockframework:spock-core:2.0-groovy-3.0'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test:2.5.0'
-	testImplementation 'org.springframework.boot:spring-boot-starter-data-jpa:2.5.0'
+	testImplementation "org.springframework.boot:spring-boot-starter-test:$spring_data_jpa_version"
+	testImplementation "org.springframework.boot:spring-boot-starter-data-jpa:$spring_data_jpa_version"
 
 	testRuntimeOnly 'com.h2database:h2:1.4.200'
 
