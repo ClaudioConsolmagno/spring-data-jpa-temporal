@@ -16,6 +16,7 @@ import org.springframework.data.repository.NoRepositoryBean;
 import org.springframework.lang.NonNull;
 import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityNotFoundException;
@@ -28,9 +29,11 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 /**
@@ -150,6 +153,58 @@ public class TemporalRepositoryImpl<T, ID> extends SimpleJpaRepository<T, ID> im
         entityAccessSupport.setAttribute(annotatedEntitySupport.getToDate(), entity, MAX_INSTANT_DEFAULT);
         entityAccessSupport.setAttribute(annotatedEntitySupport.getTemporalId(), entity, null);
         return super.save(entity);
+    }
+
+    @NonNull
+    @Override
+    @Transactional
+    public <S extends T> List<S> saveAll(@NonNull final Iterable<S> entities) {
+        Assert.notNull(entities, "Entities must not be null!");
+        val currentTime = now();
+        Map<ID, S> toSaveEntities = StreamSupport.stream(entities.spliterator(), false)
+                .peek(it -> Assert.notNull(it, "Entities must not be null!"))
+                .collect(Collectors.toMap(this::getIdFromEntity, it -> it));
+        Map<ID, T> existingEntitiesMap = findAllById(toSaveEntities.keySet(), currentTime).stream()
+                .collect(Collectors.toMap(this::getIdFromEntity, it -> it));
+
+        // Work out any entities that are already on the DB and are equals to the ones being saved. Set the temporal
+        // attributes on those entities as they won't be saved but will be returned.
+        Map<ID, S> entitiesThatDontNeedToBeSaved = toSaveEntities.entrySet().stream()
+                .filter(it -> Optional.ofNullable(existingEntitiesMap.get(it.getKey()))
+                        .filter(existingEntity -> {
+                            val toBeSavedEntity = it.getValue();
+                            if (existingEntity.equals(toBeSavedEntity)) {
+                                Object existingTemporalId = entityAccessSupport.getAttribute(annotatedEntitySupport.getTemporalId(), existingEntity);
+                                Object existingFromDate = entityAccessSupport.getAttribute(annotatedEntitySupport.getFromDate(), existingEntity);
+                                entityAccessSupport.setAttribute(annotatedEntitySupport.getTemporalId(), toBeSavedEntity, existingTemporalId);
+                                entityAccessSupport.setAttribute(annotatedEntitySupport.getFromDate(), toBeSavedEntity, existingFromDate);
+                                entityAccessSupport.setAttribute(annotatedEntitySupport.getToDate(), toBeSavedEntity, MAX_INSTANT_DEFAULT);
+                                return true;
+                            }
+                            return false;
+                        })
+                        .isPresent())
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+        // Delete any entities that need to be saved and exist on the DB
+        Set<ID> toDeleteIds = toSaveEntities.keySet().stream()
+                .filter(s -> !entitiesThatDontNeedToBeSaved.containsKey(s) && existingEntitiesMap.containsKey(s))
+                .collect(Collectors.toSet());
+        if (!toDeleteIds.isEmpty()) deleteByIds(toDeleteIds, currentTime);
+
+        // Save any entities (that need to be saved) while setting temporal attributes
+        Stream<S> savedEntitiesStream = toSaveEntities.entrySet().stream()
+                .filter(it -> !entitiesThatDontNeedToBeSaved.containsKey(it.getKey()))
+                .map(entry -> {
+                    val entity = entry.getValue();
+                    entityAccessSupport.setAttribute(annotatedEntitySupport.getFromDate(), entity, currentTime);
+                    entityAccessSupport.setAttribute(annotatedEntitySupport.getToDate(), entity, MAX_INSTANT_DEFAULT);
+                    entityAccessSupport.setAttribute(annotatedEntitySupport.getTemporalId(), entity, null);
+                    return super.save(entity);
+                });
+
+        return Stream.concat(savedEntitiesStream, entitiesThatDontNeedToBeSaved.values().stream())
+                .collect(Collectors.toList());
     }
 
     @Override
