@@ -2,7 +2,6 @@
 spotbugs {
 	effort = 'max'
 	reportLevel = "low"
-	toolVersion = '4.2.3'
 }
 spotbugsMain {
 	reports {

@@ -6,8 +6,9 @@
 #      hibernate:
 #        type: trace
 spring:
-  datasource:
-    data: db.sql
+  sql:
+    init:
+      data-locations: db.sql
 #  jpa:
 #    properties:
 #      hibernate:

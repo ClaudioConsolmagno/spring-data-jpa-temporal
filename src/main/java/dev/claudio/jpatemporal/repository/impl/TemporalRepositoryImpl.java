@@ -2,6 +2,7 @@ package dev.claudio.jpatemporal.repository.impl;
 
 import dev.claudio.jpatemporal.exception.JpaTemporalException;
 import dev.claudio.jpatemporal.repository.TemporalRepository;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.val;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
@@ -57,12 +58,13 @@ public class TemporalRepositoryImpl<T, ID> extends SimpleJpaRepository<T, ID> im
     private final AnnotatedEntitySupport annotatedEntitySupport;
     private final EntityAccessSupport<T> entityAccessSupport;
 
+    @SuppressFBWarnings({"EI_EXPOSE_REP2"})
     public TemporalRepositoryImpl(final JpaEntityInformation<T, ID> entityInformation, final EntityManager em) {
         super(entityInformation, em);
         this.entityInformation = entityInformation;
         this.em = em;
-        this.annotatedEntitySupport = new AnnotatedEntitySupport(this.getDomainClass());
-        this.entityAccessSupport = new EntityAccessSupport<>(this.getDomainClass(), this.annotatedEntitySupport.getAllAttributes());
+        this.annotatedEntitySupport = new AnnotatedEntitySupport(entityInformation.getJavaType());
+        this.entityAccessSupport = new EntityAccessSupport<>(entityInformation.getJavaType(), this.annotatedEntitySupport.getAllAttributes());
     }
 
     /******************************************************************************************************************

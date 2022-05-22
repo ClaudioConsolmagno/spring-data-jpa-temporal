@@ -4,22 +4,20 @@ plugins {
 	id 'java-library'
 	id 'signing'
 	id 'maven-publish'
-	id 'io.freefair.lombok' version '6.2.0'
-	id 'com.github.spotbugs' version '4.7.5' // https://spotbugs.readthedocs.io/en/stable/gradle.html
+	id 'io.freefair.lombok' version '6.4.3'
+	id 'com.github.spotbugs' version '5.0.7' // https://spotbugs.readthedocs.io/en/stable/gradle.html
 	id 'pmd' // https://docs.gradle.org/current/userguide/pmd_plugin.html
 	id 'checkstyle' // https://checkstyle.sourceforge.io/
 }
 
 group = 'dev.claudio'
-version = '0.1.5'
+version = '0.1.6'
 
 apply from: 'maven-publishing.gradle'
 apply from: 'code-inspection.gradle'
 
-compileJava {
-	options.release = 8
-	options.compilerArgs << '-Xlint:all'
-}
+sourceCompatibility = '8'
+compileJava.options.compilerArgs << '-Xlint:all'
 
 test {
 	useJUnitPlatform()
@@ -30,21 +28,21 @@ repositories {
 }
 
 ext {
-	spring_data_jpa_version = '2.5.4'
+	spring_data_jpa_version = '2.5.6'
 }
 
 dependencies {
 	implementation "org.springframework.data:spring-data-jpa:$spring_data_jpa_version"
 	implementation 'jakarta.persistence:jakarta.persistence-api:2.2.3'
 
-	testImplementation 'org.codehaus.groovy:groovy-all:3.0.9'
-	testImplementation 'org.spockframework:spock-spring:2.0-groovy-3.0'
-	testImplementation 'org.spockframework:spock-core:2.0-groovy-3.0'
+	testImplementation 'org.codehaus.groovy:groovy-all:3.0.10'
+	testImplementation 'org.spockframework:spock-spring:2.1-groovy-3.0'
+	testImplementation 'org.spockframework:spock-core:2.1-groovy-3.0'
 	testImplementation "org.springframework.boot:spring-boot-starter-test:$spring_data_jpa_version"
 	testImplementation "org.springframework.boot:spring-boot-starter-data-jpa:$spring_data_jpa_version"
 
 	testRuntimeOnly 'com.h2database:h2:1.4.200'
 
 	// https://find-sec-bugs.github.io/
-	spotbugsPlugins 'com.h3xstream.findsecbugs:findsecbugs-plugin:1.11.0'
+	spotbugsPlugins 'com.h3xstream.findsecbugs:findsecbugs-plugin:1.12.0'
 }

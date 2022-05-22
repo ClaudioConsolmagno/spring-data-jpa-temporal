@@ -1,6 +1,7 @@
 package dev.claudio.jpatemporal.repository.impl;
 
 import dev.claudio.jpatemporal.exception.JpaTemporalException;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.beans.FeatureDescriptor;
 import java.beans.IntrospectionException;
@@ -16,6 +17,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+@SuppressFBWarnings("THROWS_METHOD_THROWS_CLAUSE_BASIC_EXCEPTION")
 class EntityAccessSupport<T> {
     private final Map<String, Function<T, Object>> getters = new HashMap<>();
     private final Map<String, BiConsumer<T, Object>> setters = new HashMap<>();
