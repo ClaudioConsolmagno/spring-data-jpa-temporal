@@ -135,6 +135,12 @@ public class TemporalRepositoryImpl<T, ID> extends SimpleJpaRepository<T, ID> im
         return this.findById(id).orElseThrow(EntityNotFoundException::new);
     }
 
+    @NonNull
+    @Override
+    public T getById(@NonNull final ID id) {
+        return this.findById(id).orElseThrow(EntityNotFoundException::new);
+    }
+
     @Override
     public long count() {
         return super.count((Specification<T>) null);
