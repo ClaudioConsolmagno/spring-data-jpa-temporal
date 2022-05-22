@@ -5,6 +5,7 @@ import dev.claudio.jpatemporal.repository.TemporalRepository;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.val;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -120,6 +121,13 @@ public class TemporalRepositoryImpl<T, ID> extends SimpleJpaRepository<T, ID> im
     @Override
     public boolean existsById(@NonNull final ID id) {
         return this.findById(id).isPresent();
+    }
+
+    @Override
+    public <S extends T> boolean exists(@NonNull final Example<S> example) {
+        S probe = example.getProbe();
+        entityAccessSupport.setAttribute(annotatedEntitySupport.getToDate(), probe, MAX_INSTANT_DEFAULT);
+        return super.exists(example);
     }
 
     @NonNull
