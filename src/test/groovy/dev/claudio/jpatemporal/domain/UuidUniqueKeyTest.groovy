@@ -13,6 +13,7 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.data.jpa.repository.JpaRepository
 import spock.lang.Specification
 
+import javax.persistence.Column
 import javax.persistence.Entity
 import javax.persistence.GeneratedValue
 import javax.persistence.Id
@@ -66,10 +67,12 @@ class UuidUniqueKeyTest extends Specification {
 @EqualsAndHashCode(excludes = ["myTemporalId","myFromDate","myToDate"])
 class EmployeeWithUuidUniqueKey {
     @UniqueKey
+    @Column(columnDefinition = "uuid")
     UUID employeeKey
 
     @Id
     @TemporalId
+    @Column(columnDefinition = "uuid")
     @GeneratedValue(generator = "uuid")
     @GenericGenerator(name = "uuid", strategy = "org.hibernate.id.UUIDGenerator")
     UUID myTemporalId
