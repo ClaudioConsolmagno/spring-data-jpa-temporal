@@ -11,7 +11,7 @@ plugins {
 }
 
 group = 'dev.claudio'
-version = '0.1.8'
+version = '0.1.9'
 
 apply from: 'maven-publishing.gradle'
 apply from: 'code-inspection.gradle'
@@ -28,7 +28,7 @@ repositories {
 }
 
 ext {
-	spring_data_jpa_version = '2.6.4'
+	spring_data_jpa_version = '2.7.0'
 }
 
 dependencies {

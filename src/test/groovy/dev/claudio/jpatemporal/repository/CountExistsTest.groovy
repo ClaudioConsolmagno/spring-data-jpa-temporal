@@ -57,7 +57,6 @@ class CountExistsTest extends BaseTestSpecification {
             repository.count((root, _, cb) -> cb.equal(root.get("job"), 'Astronaut'), year(1998)) == 1
             repository.count((root, _, cb) -> cb.equal(root.get("job"), 'Astronaut'), year(1997)) == 0
             repository.count((root, _, cb) -> cb.equal(root.get("job"), 'Snow Plow Driver'), year(1997)) == 1
-
     }
 
     def "exists Example"() {
@@ -67,5 +66,17 @@ class CountExistsTest extends BaseTestSpecification {
             repository.exists(Example.of(new Employee(employee_id: 3)))
             !repository.exists(Example.of(new Employee(employee_id: 4)))
             !repository.exists(Example.of(new Employee(employee_id: 5)))
+    }
+
+    def "exists Spec"() {
+        expect:
+            repository.exists((root, _, cb) -> cb.equal(root.get("employee_id"), 1))
+            repository.exists((root, _, cb) -> cb.equal(root.get("employee_id"), 2))
+            repository.exists((root, _, cb) -> cb.equal(root.get("employee_id"), 3))
+            !repository.exists((root, _, cb) -> cb.equal(root.get("employee_id"), 4))
+            !repository.exists((root, _, cb) -> cb.equal(root.get("employee_id"), 5))
+            repository.exists((root, _, cb) -> cb.equal(root.get("to_date"), MAX_INSTANT))
+            repository.exists((root, _, cb) -> cb.equal(root.get("job"), 'Astronaut'))
+            !repository.exists((root, _, cb) -> cb.equal(root.get("job"), 'Snow Plow Driver'))
     }
 }

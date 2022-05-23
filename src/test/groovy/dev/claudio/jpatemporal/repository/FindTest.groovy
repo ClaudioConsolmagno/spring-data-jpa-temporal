@@ -59,6 +59,20 @@ class FindTest extends BaseTestSpecification {
             thrown(JpaObjectRetrievalFailureException) //EntityNotFoundException is converted by jpa to EntityNotFoundException, see EntityManagerFactoryUtils
     }
 
+    def "getReferenceById"() {
+        expect:
+            repository.getReferenceById(1) == homerLatestJob()
+            repository.getReferenceById(2) == margeLatestJob()
+            repository.getReferenceById(3) == skinnerLatestJob()
+    }
+
+    def "getReferenceById - missing entity"() {
+        when:
+            repository.getReferenceById(4)
+        then:
+            thrown(JpaObjectRetrievalFailureException) //EntityNotFoundException is converted by jpa to EntityNotFoundException, see EntityManagerFactoryUtils
+    }
+
     def "findAll"() {
         expect:
             repository.findAll().size() == 3

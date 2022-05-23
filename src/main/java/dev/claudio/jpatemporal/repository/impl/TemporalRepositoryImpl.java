@@ -130,6 +130,11 @@ public class TemporalRepositoryImpl<T, ID> extends SimpleJpaRepository<T, ID> im
         return super.exists(example);
     }
 
+    @Override
+    public boolean exists(@NonNull final Specification<T> spec) {
+        return super.exists(toAndFromSpecification(now()).and(spec));
+    }
+
     @NonNull
     @Override
     public List<T> findAllById(@NonNull final Iterable<ID> ids) {
@@ -138,14 +143,8 @@ public class TemporalRepositoryImpl<T, ID> extends SimpleJpaRepository<T, ID> im
 
     @NonNull
     @Override
-    @Deprecated
-    public T getOne(@NonNull final ID id) {
-        return this.findById(id).orElseThrow(EntityNotFoundException::new);
-    }
-
-    @NonNull
-    @Override
-    public T getById(@NonNull final ID id) {
+    public T getReferenceById(@NonNull final ID id) {
+        Assert.notNull(id, "The given id must not be null!");
         return this.findById(id).orElseThrow(EntityNotFoundException::new);
     }
 
@@ -256,12 +255,6 @@ public class TemporalRepositoryImpl<T, ID> extends SimpleJpaRepository<T, ID> im
                 .collect(Collectors.toSet());
         if (idsToDelete.isEmpty()) return;
         this.deleteByIds(idsToDelete, now());
-    }
-
-    @Override
-    @Deprecated
-    public void deleteInBatch(@NonNull final Iterable<T> entities) {
-        this.deleteAllInBatch(entities);
     }
 
     @Override
